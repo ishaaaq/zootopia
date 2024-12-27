@@ -12,6 +12,7 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts",
-    "app/ZooSignUp.jsx"
+    "app/ZooSignUp.jsx",
+    "app/index.jsx"
   ]
 }

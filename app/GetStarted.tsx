@@ -1,12 +1,12 @@
 import React from 'react';
-import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import image from "../assets/images/get-started.png"
 import { router } from 'expo-router';
 import CustomButton from '@/components/CustomButton';
 const GetStarted = () => {
     return (
         <SafeAreaView className='bg-white h-full flex items-center'>
-            <View className='flex flex-col'>
+            <ScrollView contentContainerStyle={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                 <Image source={image} resizeMode='contain' style={{width: 420, height: 420}} />
                 <View className='flex flex-col gap-5 mt-10  px-10' >
                 <Text className='font-bold text-3xl text-black text-center'>Your Hub for Wildlife {"\n"} Sourcing and Pet Purchases</Text>
@@ -20,7 +20,7 @@ const GetStarted = () => {
                         </TouchableOpacity>
                         </View>
                 </View>
-            </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }
