@@ -1,12 +1,18 @@
 import '../global.css'
-// import { Stack } from "expo-router";
+import { Stack } from "expo-router";
 import HomePage from './HomePage'
+import AddAnimal from './AddAnimal'
 import { createStackNavigator } from '@react-navigation/stack';
-const Stack = createStackNavigator();
+import { Slot } from 'expo-router';
+import React from 'react';
+// const Stack = createStackNavigator();
 export default function RootLayout() {
-  return <Stack.Navigator initialRouteName="HomePage">
-    <Stack.Screen name="HomePage" component={HomePage} options={{headerShown: false}}/>
-  </Stack.Navigator>
+  return (
+    <Stack initialRouteName="HomePage" screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="HomePage" />
+    <Stack.Screen name="AddAnimal" />
+  </Stack> 
+  )
 }
 
 // import 'react-native-gesture-handler';

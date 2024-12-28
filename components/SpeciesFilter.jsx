@@ -8,7 +8,7 @@ const SpeciesFilter = ({ species, selectedSpecies, onSelectSpecies }) => {
       showsHorizontalScrollIndicator={false}
       className="flex-row mb-4"
     >
-      {species.map((specie, index) => (
+      {species?.map((specie, index) => (
         <TouchableOpacity
           key={index}
           onPress={() => onSelectSpecies(specie)}

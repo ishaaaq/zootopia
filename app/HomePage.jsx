@@ -7,6 +7,9 @@ import Card from "@/components/Card";
 import FloatingActionButton from "@/components/Fab";
 import panda from "@/assets/images/panda.jpg";
 import deer from "@/assets/images/animals/deer.jpg";
+import ALPHABETS from "@/lib/data";
+import { router } from "expo-router";
+import AddAnimal from "./AddAnimal";
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState(null);
@@ -25,10 +28,6 @@ const HomePage = () => {
     { id: 11, name: "Alex", age: "1", species: "Birds", image: panda },
     { id: 12, name: "Bella", age: "2", species: "Mammals", image: deer },
   ];
-
-  const handleAddAnimal = () => {
-    console.log("Navigating to Add Animal Form...");
-  };
 
   const filteredAnimals = animals.filter((animal) => {
     const matchesSpecies =
@@ -56,10 +55,14 @@ const HomePage = () => {
         }
       />
 
-      {["A", "B", "C"].map((letter) => {
+      {ALPHABETS.map((letter) => {
         const animalsByLetter = filteredAnimals.filter((animal) =>
           animal.name.startsWith(letter)
         );
+
+        if (animalsByLetter.length === 0) {
+          return null;
+        }
 
         return (
           <View key={letter}>
@@ -81,7 +84,7 @@ const HomePage = () => {
         );
       })}
 
-      <FloatingActionButton onPress={handleAddAnimal} />
+      <FloatingActionButton onPress={router.push(AddAnimal)} />
     </ScrollView>
   );
 };
