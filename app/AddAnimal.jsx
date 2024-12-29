@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Image,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -18,6 +19,7 @@ const AddAnimal = () => {
   const [dob, setDob] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [imageName, setImageName] = useState();
   const initialValues = {
     name: "",
     species: "",
@@ -66,19 +68,21 @@ const AddAnimal = () => {
 
     // Launch image picker
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      mediaTypes: ["images", "videos"],
+      allowsEditing: false,
       aspect: [4, 3],
       quality: 1,
     });
+    console.log(result);
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      setSelectedImage(result.assets[0].uri);
+      setImageName(result.assets[0].fileName);
     }
   };
 
   return (
-    <ScrollView className="flex-1 bg-white p-4">
+    <ScrollView className="flex-1 bg-white p-4 ">
       <TouchableOpacity onPress={() => router.back()} className="mb-4">
         <Ionicons name="arrow-back" size={24} color="blue" />
       </TouchableOpacity>
@@ -155,7 +159,7 @@ const AddAnimal = () => {
               onPress={pickImage}
               className="border border-gray-300 rounded p-3 mb-4 bg-gray-100"
             >
-              <Text>Select Image</Text>
+              <Text>{`${selectedImage ? imageName : "Select Image"}`}</Text>
             </TouchableOpacity>
             {selectedImage && (
               <Image
@@ -170,7 +174,10 @@ const AddAnimal = () => {
             {/* Description */}
             <Text className="text-lg font-semibold mb-2">Description</Text>
             <TextInput
-              className="border border-gray-300 rounded p-2 mb-4"
+              className="border border-gray-300 rounded p-2 mb-4 h-50"
+              style={{ textAlignVertical: "top" }}
+              multiline={true}
+              numberOfLines={4}
               placeholder="Enter description (optional)"
               onChangeText={handleChange("description")}
               onBlur={handleBlur("description")}

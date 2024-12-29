@@ -4,14 +4,17 @@ import HomePage from './HomePage'
 import AddAnimal from './AddAnimal'
 import { createStackNavigator } from '@react-navigation/stack';
 import { Slot } from 'expo-router';
+import {AnimalsProvider} from "../lib/AnimalsProvider"
 import React from 'react';
-// const Stack = createStackNavigator();
 export default function RootLayout() {
   return (
+    <AnimalsProvider>
+
     <Stack initialRouteName="HomePage" screenOptions={{ headerShown: false }}>
     <Stack.Screen name="HomePage" />
     <Stack.Screen name="AddAnimal" />
   </Stack> 
+    </AnimalsProvider>
   )
 }
 
@@ -19,7 +22,7 @@ export default function RootLayout() {
 // import React from 'react';
 // import { NavigationContainer } from '@react-navigation/native';
 // import { createStackNavigator } from '@react-navigation/stack';
-// import GetStarted from './GetStarted'; // Adjust the import path as necessary
+// import GetStarted from './GetStarted'; 
 // import SelectUserType from './SelectUserType'
 // import ZooSignUp from './ZooSignUp';
 // import PetBuyerSignup from './PetBuyerSignup'
@@ -30,8 +33,8 @@ export default function RootLayout() {
 // const RootLayout = () => {
 //     return (
 //         <>
-//                 <Stack.Screen name="GetStarted" component={GetStarted} options={{ headerShown: false }} />
 //             <Stack.Navigator initialRouteName="GetStarted">
+//                 <Stack.Screen name="GetStarted" component={GetStarted} options={{ headerShown: false }} />
 //                 <Stack.Screen name="SelectUserType" component={SelectUserType} options={{ headerShown: false }}/>
 //                 <Stack.Screen name="ZooSignUp" component={ZooSignUp} options={{ headerShown: false }}/>
 //                 <Stack.Screen name="PetBuyerSignup" component={PetBuyerSignup} options={{ headerShown: false }}/>
