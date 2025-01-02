@@ -12,9 +12,10 @@ import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
 import InputField from "../components/InputField";
 import FormButton from "../components/FormButton";
+import { router } from "expo-router";
+
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Invalid email format")
@@ -24,6 +25,11 @@ const LoginForm = () => {
       .required("Password is required"),
   });
 
+  const handleSubmit = () => {
+    console.log("Login button pressed");
+    router.replace("/HomePage");
+  };
+
   return (
     <Formik
       initialValues={{
@@ -31,7 +37,7 @@ const LoginForm = () => {
         password: "",
       }}
       validationSchema={validationSchema}
-      onSubmit={(values) => console.log(values)}
+      onSubmit={handleSubmit}
     >
       {({
         values,
@@ -75,3 +81,41 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
+
+// import React from "react";
+// import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+// import { useRouter } from "expo-router";
+
+// const LoginForm = () => {
+//   const router = useRouter();
+
+//   const handleLogin = () => {
+//     console.log(router);
+//     router.replace("tabs");
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       <TextInput style={styles.input} placeholder="Email" />
+//       <TextInput style={styles.input} placeholder="Password" secureTextEntry />
+//       <Button onPress={handleLogin} title="Sign In" />
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     justifyContent: "center",
+//     padding: 16,
+//   },
+//   input: {
+//     height: 40,
+//     borderColor: "gray",
+//     borderWidth: 1,
+//     marginBottom: 12,
+//     paddingHorizontal: 8,
+//   },
+// });
+
+// export default LoginForm;

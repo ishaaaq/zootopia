@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useAnimals } from "../../lib/AnimalsProvider";
+import { useAnimals } from "@/lib/AnimalsProvider";
 
 const AnimalDetails = ({ route }) => {
   const router = useRouter();

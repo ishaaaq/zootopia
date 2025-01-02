@@ -1,22 +1,27 @@
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 const SpeciesFilter = ({ species, selectedSpecies, onSelectSpecies }) => {
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      className="flex-row mb-4"
+      className="flex-row mb-4 h-20"
     >
       {species?.map((specie, index) => (
         <TouchableOpacity
           key={index}
           onPress={() => onSelectSpecies(specie)}
-          className={`px-4 py-2 rounded-full mr-2 ${
-            selectedSpecies === specie ? "bg-blue-500" : "bg-gray-200"
+          className={`px-4 py-2 rounded-lg mr-5 shadow-md shadow-black-100  w-15 h-15 ${
+            selectedSpecies === specie ? "bg-primary" : "bg-gray-200"
           }`}
         >
-          <View className="flex-row items-center">
+          <MaterialCommunityIcons
+            name="person"
+            size={25}
+            color={selectedSpecies === specie ? "white" : "primary"}
+          />
+          {/* <View className="flex-row items-center">
             <Text
               className={`${
                 selectedSpecies === specie ? "text-white" : "text-gray-700"
@@ -24,7 +29,7 @@ const SpeciesFilter = ({ species, selectedSpecies, onSelectSpecies }) => {
             >
               {specie}
             </Text>
-          </View>
+          </View> */}
         </TouchableOpacity>
       ))}
     </ScrollView>

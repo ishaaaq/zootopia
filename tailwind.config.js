@@ -5,7 +5,13 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      fontFamily: {
+        tc: ["tc", "sans-serif"],
+        "tc-bold": ["tc-bold", "sans-serif"],
+      },
       spacing: {
+        13: "3.25rem",
+        14: "3.5rem",
         15: "3.75rem",
         25: "6.25rem", // 100px
         30: "7.5rem", // 120px
@@ -23,6 +29,21 @@ module.exports = {
         90: "22.5rem", // 360px
         95: "23.75rem", // 380px
         100: "25rem", // 400px
+      },
+      colors: {
+        primary: {
+          DEFAULT: "#CE4B26", // Base color
+          50: "#FFECE7", // Lightest shade
+          100: "#FFDACF",
+          200: "#FFB39E",
+          300: "#FF8D6E",
+          400: "#FF6641",
+          500: "#CE4B26", // Main color (DEFAULT)
+          600: "#B0421F",
+          700: "#913818",
+          800: "#732E12",
+          900: "#541F0B", // Darkest shade
+        },
       },
     },
   },
