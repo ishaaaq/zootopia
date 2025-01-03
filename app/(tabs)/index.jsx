@@ -11,6 +11,7 @@ import { useAnimals } from "@/lib/AnimalsProvider";
 import icons from "@/constants/icons";
 import { Ionicons } from "@expo/vector-icons";
 import FilterModal from "../../components/FilterModal";
+import sellers from "@/lib/data";
 const index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState("All");
@@ -74,11 +75,13 @@ const index = () => {
       />
 
       <View className="flex flex-row flex-wrap justify-center w-full">
-        {animals.map((animal) => (
-          <View key={animal.id} className="w-1/2">
-            <Card {...animal} onPress={() => handlePress(animal.id)} />
-          </View>
-        ))}
+        {sellers.map((seller) =>
+          seller.animals.map((animal) => (
+            <View key={animal.id} className="w-1/2">
+              <Card {...animal} onPress={() => handlePress(animal.id)} />
+            </View>
+          ))
+        )}
       </View>
 
       <FilterModal

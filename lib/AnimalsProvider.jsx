@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import panda from "@/assets/images/panda.jpg";
-import deer from "@/assets/images/animals/deer.jpg";
+import deer from "@/assets/images/animals/deer1.jpg";
 // Create the context
 const AnimalsContext = createContext();
 

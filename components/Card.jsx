@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 
-const AnimalCard = ({ image, name, species, age, onPress }) => {
+const AnimalCard = ({ image, name, specie, price, onPress }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -16,10 +16,13 @@ const AnimalCard = ({ image, name, species, age, onPress }) => {
       />
 
       {/* Animal Details */}
-      <View className="px-2 ">
-        <Text className="text-lg font-bold text-gray-800">{name}</Text>
-        <Text className="text-sm text-gray-500">{`Age: ${age}`}</Text>
-        <Text className="text-sm text-gray-500">{`Specie: ${species}`}</Text>
+      <View className="px-2 flex flex-row justify-between">
+        <View>
+          <Text className="text-lg font-bold text-gray-800">{name}</Text>
+
+          <Text className="text-sm text-gray-500">{`Specie: ${specie}`}</Text>
+        </View>
+        <Text className="font-tc-bold text-gray-500 my-auto">{`$${price}`}</Text>
       </View>
     </TouchableOpacity>
   );
