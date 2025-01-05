@@ -33,7 +33,8 @@ import PetSupplierSignup from './PetSupplierSignup'
 import Login from './Login'
 import {useFonts}from "expo-font"
 import { Stack } from 'expo-router';
-import { AnimalsProvider } from '../lib/AnimalsProvider';
+import { SellersProvider } from '../lib/SellersProvider';
+import { AnimalsProvider } from '@/lib/AnimalsProvider';
 // const Stack = createStackNavigator();
 
 const RootLayout = () => {
@@ -45,10 +46,12 @@ const RootLayout = () => {
     return (
         <>
         <AnimalsProvider>
+
+        <SellersProvider>
             <Stack>
                 <Stack.Screen name="GetStarted" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="[id]" options={{ headerShown: false }} />
+                <Stack.Screen name="AnimalDetails" options={{ headerShown: false }} />
                 <Stack.Screen name="SelectUserType"  options={{ headerShown: false }}/>
                 <Stack.Screen name="ZooSignUp"  options={{ headerShown: false }}/>
                 <Stack.Screen name="PetBuyerSignup" options={{ headerShown: false }}/>
@@ -56,7 +59,8 @@ const RootLayout = () => {
                 <Stack.Screen name="Login"  options={{ headerShown: false }}/>
               
             </Stack>
-            </AnimalsProvider>
+            </SellersProvider>
+        </AnimalsProvider>
            
 
 

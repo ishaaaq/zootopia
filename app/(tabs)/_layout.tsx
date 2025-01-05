@@ -4,6 +4,7 @@ import { Tabs } from "expo-router";
 import icons from "@/constants/icons";
 import { AnimalsProvider } from "@/lib/AnimalsProvider";
 import {ZoosProvider} from "@/lib/ZoosProvider"
+import { SellersProvider } from "@/lib/SellersProvider";
 const TabIcon = ({ focused, icon, title }) => (
   <View className="flex-1 mt-1 flex flex-col items-center">
     <Image
@@ -29,7 +30,7 @@ const TabIcon = ({ focused, icon, title }) => (
 
 const ZooLayout = () => {
   return (
-    <AnimalsProvider>
+    <SellersProvider>
       <ZoosProvider>
     <Tabs
       screenOptions={{
@@ -90,7 +91,7 @@ const ZooLayout = () => {
       />
     </Tabs>
     </ZoosProvider>
-    </AnimalsProvider>
+    </SellersProvider>
   );
 };
 

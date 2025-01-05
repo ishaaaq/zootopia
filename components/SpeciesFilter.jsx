@@ -12,13 +12,13 @@ const SpeciesFilter = ({ species, selectedSpecies, onSelectSpecies }) => {
         <TouchableOpacity
           key={index}
           onPress={() => onSelectSpecies(specie)}
-          className={`px-4 py-2 rounded-lg mr-5 shadow-md shadow-black-100  w-15 h-15 ${
+          className={` flex justify-center px-4 py-2 rounded-lg mr-5 shadow-md shadow-black-100  w-15 h-15 ${
             selectedSpecies === specie ? "bg-primary" : "bg-gray-200"
           }`}
         >
           <MaterialCommunityIcons
-            name="person"
-            size={25}
+            name="fish"
+            size={30}
             color={selectedSpecies === specie ? "white" : "primary"}
           />
           {/* <View className="flex-row items-center">

@@ -2,23 +2,22 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
 import SearchBar from "@/components/SearchBar";
 import SpeciesFilter from "@/components/SpeciesFilter";
-import AlphabetSectionHeader from "@/components/AlphabetSectionHeader";
 import Card from "@/components/Card";
-import FloatingActionButton from "@/components/Fab";
-import ALPHABETS from "@/lib/data";
-import { router } from "expo-router";
+
 import { useAnimals } from "@/lib/AnimalsProvider";
 import icons from "@/constants/icons";
 import { Ionicons } from "@expo/vector-icons";
 import FilterModal from "../../components/FilterModal";
 import sellers from "@/lib/data";
+import { useRouter } from "expo-router";
+
 const index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState("All");
   const species = ["All", "Mammals", "Birds", "Reptiles", "Amphibians", "Fish"];
   const { animals } = useAnimals();
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
-
+  const router = useRouter();
   const toggleFilterModal = () => {
     setFilterModalVisible(!isFilterModalVisible);
   };
@@ -32,7 +31,6 @@ const index = () => {
       .includes(searchQuery.toLowerCase());
     return matchesSpecies && matchesSearchQuery;
   });
-  const handlePress = (id) => router.push(`/${id}`);
 
   return (
     <ScrollView className="flex-1 bg-white p-4">
@@ -78,7 +76,14 @@ const index = () => {
         {sellers.map((seller) =>
           seller.animals.map((animal) => (
             <View key={animal.id} className="w-1/2">
-              <Card {...animal} onPress={() => handlePress(animal.id)} />
+              <Card
+                {...animal}
+                onPress={() =>
+                  router.push(
+                    `/AnimalDetails?sellerId=${seller.id}&animalId=${animal.id}`
+                  )
+                }
+              />
             </View>
           ))
         )}
