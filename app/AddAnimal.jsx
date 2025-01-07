@@ -1,96 +1,167 @@
-import React from "react";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  Alert,
   Image,
+  Modal,
+  ScrollView,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { useState } from "react";
-import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+
+export const unstable_settings = {
+  headerShown: false,
+};
+
 const AddAnimal = () => {
-  const [dob, setDob] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imageName, setImageName] = useState();
-  const initialValues = {
-    name: "",
-    species: "",
-    dob: "",
-    description: "",
-    image: null,
+  const [photo, setPhoto] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [successVisible, setSuccessVisible] = useState(false);
+
+  const handleImagePicker = () => {
+    setModalVisible(true);
+  };
+
+  const handleAddAnimal = () => {
+    setSuccessVisible(true);
   };
 
   const validationSchema = Yup.object({
-    name: Yup.string().required("Animal name is required"),
-    species: Yup.string().required("Species is required"),
-    dob: Yup.date().required("Date of birth is required"),
-    description: Yup.string(),
-    image: Yup.mixed().required("Image is required"),
+    name: Yup.string().required("Name is required"),
+    type: Yup.string().required("Type is required"),
+    category: Yup.string().required("Category is required"),
+    shortDescription: Yup.string().required("Short description is required"),
+    quantity: Yup.number()
+      .required("Quantity is required")
+      .positive("Quantity must be positive")
+      .integer("Quantity must be an integer"),
+    price: Yup.number()
+      .required("Price is required")
+      .positive("Price must be positive"),
+    longDescription: Yup.string().required("Long description is required"),
+    breed: Yup.string(), // Optional field
   });
 
-  const calculateAge = (dob) => {
-    const now = new Date();
-    const diff = now - new Date(dob);
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (days < 30) return `${days} days old`;
-    const months = Math.floor(days / 30);
-    if (months < 12) return `${months} months old`;
-    const years = Math.floor(months / 12);
-    return `${years} years old`;
+  const initialValues = {
+    name: "",
+    type: "",
+    category: "",
+    breed: "",
+    shortDescription: "",
+    quantity: "",
+    price: "",
+    longDescription: "",
   };
 
-  const handleFormSubmit = (values) => {
-    const age = calculateAge(values.dob);
-    console.log({ ...values, age });
-    //add animals to array here
-    Alert.alert("Animal Added", `The animal is ${age}`, [
-      { text: "OK", onPress: () => router.back() },
-    ]);
-  };
+  const InputField = ({
+    label,
+    placeholder,
+    onChangeText,
+    onBlur,
+    value,
+    error,
+    touched,
+    ...props
+  }) => (
+    <View className="mb-6">
+      <Text className="text-gray-700 mb-2">{label}</Text>
+      <TextInput
+        className="bg-white p-4 rounded-lg border border-gray-300"
+        placeholder={placeholder}
+        onChangeText={onChangeText}
+        onBlur={onBlur}
+        value={value}
+        {...props}
+      />
+      {touched && error && <Text className="text-red-500 mt-2">{error}</Text>}
+    </View>
+  );
 
-  const pickImage = async () => {
-    // Ask for media library permissions
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      alert("Permission to access gallery is required!");
-      return;
-    }
-
-    // Launch image picker
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    console.log(result);
-
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-      setImageName(result.assets[0].fileName);
-    }
-  };
+  const DropdownField = ({
+    label,
+    selectedValue,
+    onValueChange,
+    options,
+    error,
+    touched,
+  }) => (
+    <View className="mb-6">
+      <Text className="text-gray-700 mb-2">{label}</Text>
+      <View className="bg-white rounded-lg border border-gray-300 h-13 flex justify-center">
+        <Picker
+          selectedValue={selectedValue}
+          onValueChange={onValueChange}
+          className="h-13"
+        >
+          <Picker.Item label={`Select ${label.toLowerCase()}`} value="" />
+          {options.map((option, index) => (
+            <Picker.Item
+              key={index}
+              label={option.label}
+              value={option.value}
+            />
+          ))}
+        </Picker>
+      </View>
+      {touched && error && <Text className="text-red-500 mt-2">{error}</Text>}
+    </View>
+  );
 
   return (
-    <ScrollView className="flex-1 bg-white p-4 ">
-      <TouchableOpacity onPress={() => router.back()} className="mb-4">
-        <Ionicons name="arrow-back" size={24} color="blue" />
+    <ScrollView className="flex-1 bg-gray-100 p-4 mb-15">
+      <TouchableOpacity
+        onPress={() => router.back()}
+        className="bg-white p-2 rounded-lg shadow-sm w-10 mb-2"
+      >
+        <Ionicons name="arrow-back" size={25} />
       </TouchableOpacity>
-      <Text className="text-2xl font-bold mb-6">Add Animal</Text>
+      {/* Header */}
+      <View className="bg-white rounded-lg shadow-md flex flex-row justify-between">
+        <View className="ml-4 mt-4">
+          <Text className="text-lg font-bold text-primary-500">
+            Add new Animal
+          </Text>
+          <Text className="text-sm text-gray-500">
+            Add new Animal to marketplace
+          </Text>
+        </View>
+        <Image
+          style={{ width: 100, height: 100 }}
+          source={require("@/assets/images/Pup.jpg")}
+        />
+      </View>
+
+      {/* Image Picker */}
+      <TouchableOpacity
+        className="mt-6 bg-gray-200 w-full h-40 rounded-lg flex items-center justify-center border border-gray-300"
+        onPress={handleImagePicker}
+      >
+        {photo ? (
+          <Image
+            source={{ uri: photo }}
+            className="w-full h-full rounded-lg"
+            resizeMode="cover"
+          />
+        ) : (
+          <View className="flex-row items-center">
+            <Ionicons name="camera" size={34} color={"#CE4B26"} />
+            <Text className="text-primary-500 text-2xl"> Add photo</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+
+      {/* Form */}
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={handleFormSubmit}
+        onSubmit={(values) => {
+          console.log(values); // Handle form submission
+        }}
       >
         {({
           handleChange,
@@ -100,103 +171,169 @@ const AddAnimal = () => {
           errors,
           touched,
         }) => (
-          <View>
+          <View className="mt-2">
             {/* Name */}
-            <Text className="text-lg font-semibold mb-2">Animal Name</Text>
-            <TextInput
-              className="border border-gray-300 rounded p-2 mb-4"
-              placeholder="Enter animal name"
+            <InputField
+              label="Name"
+              placeholder="Enter animal's name"
               onChangeText={handleChange("name")}
               onBlur={handleBlur("name")}
               value={values.name}
+              error={errors.name}
+              touched={touched.name}
             />
-            {touched.name && errors.name && (
-              <Text className="text-red-500 mb-4">{errors.name}</Text>
-            )}
-
-            {/* Species */}
-            <Text className="text-lg font-semibold mb-2">Species</Text>
-            <TextInput
-              className="border border-gray-300 rounded p-2 mb-4"
-              placeholder="Enter species"
-              onChangeText={handleChange("species")}
-              onBlur={handleBlur("species")}
-              value={values.species}
+            {/* Type */}
+            <DropdownField
+              label="Type"
+              selectedValue={values.type}
+              onValueChange={handleChange("type")}
+              options={[
+                { label: "Domestic", value: "domestic" },
+                { label: "Wild", value: "wild" },
+              ]}
+              error={errors.type}
+              touched={touched.type}
             />
-            {touched.species && errors.species && (
-              <Text className="text-red-500 mb-4">{errors.species}</Text>
-            )}
-
-            {/* DOB */}
-            <Text className="text-lg font-semibold mb-2">Date of Birth</Text>
-            <TouchableOpacity
-              onPress={() => setShowDatePicker(true)}
-              className="border border-gray-300 rounded p-3 mb-4 bg-gray-100"
-            >
-              <Text>{dob ? dob.toDateString() : "Select Date"}</Text>
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={dob}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  setShowDatePicker(false);
-                  if (selectedDate) {
-                    setDob(selectedDate);
-                    handleChange("dob")(selectedDate.toISOString());
-                  }
-                }}
-              />
-            )}
-            {touched.dob && errors.dob && (
-              <Text className="text-red-500 mb-4">{errors.dob}</Text>
-            )}
-
-            {/* Image Upload */}
-            <Text className="text-lg font-semibold mb-2">Upload Image</Text>
-            <TouchableOpacity
-              onPress={pickImage}
-              className="border border-gray-300 rounded p-3 mb-4 bg-gray-100"
-            >
-              <Text>{`${selectedImage ? imageName : "Select Image"}`}</Text>
-            </TouchableOpacity>
-            {selectedImage && (
-              <Image
-                source={{ uri: selectedImage }}
-                className="w-32 h-32 rounded mb-4"
-              />
-            )}
-            {errors.image && touched.image && (
-              <Text className="text-red-500 mb-4">{errors.image}</Text>
-            )}
-
-            {/* Description */}
-            <Text className="text-lg font-semibold mb-2">Description</Text>
-            <TextInput
-              className="border border-gray-300 rounded p-2 mb-4 h-50"
-              style={{ textAlignVertical: "top" }}
-              multiline={true}
+            {/* Category */}
+            <DropdownField
+              label="Category"
+              selectedValue={values.category}
+              onValueChange={handleChange("category")}
+              options={[
+                { label: "Mammals", value: "mammals" },
+                { label: "Reptiles", value: "reptiles" },
+                { label: "Birds", value: "birds" },
+                { label: "Fish", value: "fish" },
+                { label: "Amphibians", value: "amphibians" },
+                { label: "Other", value: "other" },
+              ]}
+              error={errors.category}
+              touched={touched.category}
+            />
+            {/* Breed */}
+            <InputField
+              label="Breed"
+              placeholder="Enter breed (optional)"
+              onChangeText={handleChange("breed")}
+              onBlur={handleBlur("breed")}
+              value={values.breed}
+              error={errors.breed}
+              touched={touched.breed}
+            />
+            {/* Short Description */}
+            <InputField
+              label="Short Description"
+              placeholder="Enter a short description for your animal(s)"
+              onChangeText={handleChange("shortDescription")}
+              onBlur={handleBlur("shortDescription")}
+              value={values.shortDescription}
+              error={errors.shortDescription}
+              touched={touched.shortDescription}
+            />
+            {/* Quantity */}
+            <InputField
+              label="Quantity"
+              placeholder="22"
+              keyboardType="numeric"
+              onChangeText={handleChange("quantity")}
+              onBlur={handleBlur("quantity")}
+              value={values.quantity}
+              error={errors.quantity}
+              touched={touched.quantity}
+            />
+            {/* Price */}
+            <InputField
+              label="Price"
+              placeholder="Enter price"
+              keyboardType="numeric"
+              onChangeText={handleChange("price")}
+              onBlur={handleBlur("price")}
+              value={values.price}
+              error={errors.price}
+              touched={touched.price}
+            />
+            {/* Long Description */}
+            <InputField
+              label="Detailed Description"
+              placeholder="Detailed description that ansers buyers' FAQ"
+              multiline
               numberOfLines={4}
-              placeholder="Enter description (optional)"
-              onChangeText={handleChange("description")}
-              onBlur={handleBlur("description")}
-              value={values.description}
+              onChangeText={handleChange("longDescription")}
+              onBlur={handleBlur("longDescription")}
+              value={values.longDescription}
+              error={errors.longDescription}
+              touched={touched.longDescription}
             />
-            {touched.description && errors.description && (
-              <Text className="text-red-500 mb-4">{errors.description}</Text>
-            )}
-
-            {/* Submit Button */}
             <TouchableOpacity
-              onPress={handleSubmit}
-              className="bg-blue-500 rounded-full p-3"
+              className=" bg-primary-500 py-4 rounded-lg"
+              onPress={handleAddAnimal}
             >
-              <Text className="text-white text-center text-lg">Add Animal</Text>
-            </TouchableOpacity>
+              <Text className="text-white text-center font-bold">Add</Text>
+            </TouchableOpacity>{" "}
           </View>
         )}
       </Formik>
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
+          <View className="bg-white w-4/5 p-4 rounded-lg">
+            <Text className="text-center font-bold mb-4">Add a Photo</Text>
+            <TouchableOpacity
+              className="p-4 border-b border-gray-300"
+              onPress={() => {
+                setPhoto("camera-photo-uri"); // Placeholder URI
+                setModalVisible(false);
+              }}
+            >
+              <Text className="text-center text-blue-500">Camera</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="p-4 border-b border-gray-300"
+              onPress={() => {
+                setPhoto("gallery-photo-uri"); // Placeholder URI
+                setModalVisible(false);
+              }}
+            >
+              <Text className="text-center text-blue-500">Gallery</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="p-4"
+              onPress={() => {
+                setPhoto(null);
+                setModalVisible(false);
+              }}
+            >
+              <Text className="text-center text-red-500">Remove Image</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent={true}
+        visible={successVisible}
+        animationType="fade"
+        onRequestClose={() => setSuccessVisible(false)}
+      >
+        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
+          <View className="bg-white w-4/5 p-6 rounded-lg items-center">
+            <Ionicons name="shield-checkmark" size={40} color="#CE4B26" />
+            <Text className="text-lg font-bold text-center mt-4">
+              Your pet successfully added
+            </Text>
+            <TouchableOpacity
+              className="mt-6 bg-primary-500 px-6 py-2 rounded-lg"
+              onPress={() => setSuccessVisible(false)}
+            >
+              <Text className="text-white font-bold">Ok</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };

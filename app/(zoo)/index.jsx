@@ -3,11 +3,10 @@ import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
 import SearchBar from "@/components/SearchBar";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import Card from "@/components/Card";
-
 import { useAnimals } from "@/lib/AnimalsProvider";
 import icons from "@/constants/icons";
 import { Ionicons } from "@expo/vector-icons";
-import FilterModal from "../../components/FilterModal";
+import FilterModal from "@/components/FilterModal";
 import sellers from "@/lib/data";
 import { useRouter } from "expo-router";
 
