@@ -34,6 +34,7 @@ const RootLayout = () => {
                 <Stack.Screen name="(buyer)" options={{ headerShown: false }} />
                 <Stack.Screen name="(supplier)" options={{ headerShown: false }} />
                 <Stack.Screen name="AddAnimal" options={{ headerShown: false }} />
+                <Stack.Screen name="EditProfile" options={{ headerShown: false }} />
                 <Stack.Screen name="AnimalDetails" options={{ headerShown: false }} />
                 <Stack.Screen name="SelectUserType"  options={{ headerShown: false }}/>
                 <Stack.Screen name="auth/signup/Zoo"  options={{ headerShown: false }}/>
