@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,19 +10,20 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { fetchAnimalsForCurrentUser } from "@/lib/AppWrite";
 
 const SupplierHome = () => {
-  const [animals, setAnimals] = useState([]); // Animal data
   const router = useRouter();
+  const [animals, setAnimals] = useState([]);
 
-  // Placeholder function to add a new animal (for testing purposes)
-  const addAnimal = (animal) => {
-    const newAnimal = {
-      id: animals.length + 1,
-      ...animal,
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetchAnimalsForCurrentUser();
+      setAnimals(data);
     };
-    setAnimals([...animals, newAnimal]);
-  };
+
+    fetchData();
+  }, []);
 
   const renderAnimalCard = ({ item }) => (
     <View className="flex-row bg-gray-100 rounded-lg p-4 mb-4 items-center">
@@ -33,9 +34,13 @@ const SupplierHome = () => {
       <View className="flex-1">
         <Text className="text-lg font-bold text-gray-800">{item.name}</Text>
         <Text className="text-sm text-gray-600">
-          {item.species} - {item.age}
+          {item.category} - {item.quantity}
         </Text>
+        <Text className="text-lg font-bold text-primary-800">{`N${item.price}`}</Text>
       </View>
+      <TouchableOpacity onPress={() => router.push("../EditAnimal")}>
+        <Ionicons name="create-outline" size={30} color="grey" />
+      </TouchableOpacity>
     </View>
   );
 
@@ -70,7 +75,7 @@ const SupplierHome = () => {
         <FlatList
           data={animals}
           renderItem={renderAnimalCard}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.$id}
           contentContainerStyle={{ paddingBottom: 20 }}
           ListFooterComponent={
             <TouchableOpacity

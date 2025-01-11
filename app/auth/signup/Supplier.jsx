@@ -12,6 +12,8 @@ import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
 import InputField from "@/components/InputField";
 import FormButton from "@/components/FormButton";
+import { signup } from "@/lib/AppWrite";
+import { router } from "expo-router";
 const PetSupplierSignupForm = () => {
   const [showPassword, setShowPassword] = useState({
     password: false,
@@ -20,7 +22,6 @@ const PetSupplierSignupForm = () => {
 
   const validationSchema = Yup.object().shape({
     businessName: Yup.string().required("Business Name is required"),
-    licenseNumber: Yup.string().required("License Number is required"),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
@@ -35,18 +36,22 @@ const PetSupplierSignupForm = () => {
       .required("Confirm Password is required"),
   });
 
+  const handleSubmit = async (values) => {
+    const response = await signup("supplier", values);
+    if (response) router.replace("(supplier)");
+  };
+
   return (
     <Formik
       initialValues={{
         businessName: "",
-        licenseNumber: "",
         email: "",
         phoneNumber: "",
         password: "",
         confirmPassword: "",
       }}
       validationSchema={validationSchema}
-      onSubmit={(values) => console.log(values)}
+      onSubmit={(values) => handleSubmit(values)}
     >
       {({
         values,
@@ -74,16 +79,6 @@ const PetSupplierSignupForm = () => {
             onChangeText={handleChange("businessName")}
             onBlur={handleBlur("businessName")}
             errorMessage={touched.businessName && errors.businessName}
-          />
-
-          <InputField
-            name="licenseNumber"
-            title="License Number"
-            placeholder="123456789"
-            value={values.licenseNumber}
-            onChangeText={handleChange("licenseNumber")}
-            onBlur={handleBlur("licenseNumber")}
-            errorMessage={touched.licenseNumber && errors.licenseNumber}
           />
 
           <InputField

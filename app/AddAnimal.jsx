@@ -14,21 +14,22 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { router } from "expo-router";
 import { InputField } from "../components/NewInput";
-export const unstable_settings = {
-  headerShown: false,
-};
-
+import { useGlobalContext } from "@/lib/global-provider";
+import { addAnimal } from "@/lib/AppWrite";
+import sadpup from "@/assets/images/animals/criollo.jpg";
 const AddAnimal = () => {
-  const [photo, setPhoto] = useState(null);
+  const [photo, setPhoto] = useState(sadpup);
   const [modalVisible, setModalVisible] = useState(false);
   const [successVisible, setSuccessVisible] = useState(false);
-
+  const { userDetails, user } = useGlobalContext();
   const handleImagePicker = () => {
     setModalVisible(true);
   };
 
-  const handleAddAnimal = () => {
-    setSuccessVisible(true);
+  const handleSubmit = async (values) => {
+    const supplierId = userDetails.$id;
+    const response = await addAnimal(supplierId, photo, values);
+    if (response) setSuccessVisible(true);
   };
 
   const validationSchema = Yup.object({
@@ -119,7 +120,8 @@ const AddAnimal = () => {
       >
         {photo ? (
           <Image
-            source={{ uri: photo }}
+            source={photo}
+            style={{ width: "100%", height: "100%" }}
             className="w-full h-full rounded-lg"
             resizeMode="cover"
           />
@@ -136,7 +138,7 @@ const AddAnimal = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={(values) => {
-          console.log(values); // Handle form submission
+          handleSubmit(values); // Handle form submission
         }}
       >
         {({
@@ -176,12 +178,12 @@ const AddAnimal = () => {
               selectedValue={values.category}
               onValueChange={handleChange("category")}
               options={[
-                { label: "Mammals", value: "mammals" },
-                { label: "Reptiles", value: "reptiles" },
-                { label: "Birds", value: "birds" },
+                { label: "Mammals", value: "mammal" },
+                { label: "Reptiles", value: "reptile" },
+                { label: "Birds", value: "bird" },
                 { label: "Fish", value: "fish" },
-                { label: "Amphibians", value: "amphibians" },
-                { label: "Other", value: "other" },
+                { label: "Amphibians", value: "amphibian" },
+                { label: "Other", value: "others" },
               ]}
               error={errors.category}
               touched={touched.category}
@@ -242,7 +244,7 @@ const AddAnimal = () => {
             />
             <TouchableOpacity
               className=" bg-primary-500 py-4 rounded-lg"
-              onPress={handleAddAnimal}
+              onPress={handleSubmit}
             >
               <Text className="text-white text-center font-bold">Add</Text>
             </TouchableOpacity>{" "}

@@ -29,7 +29,10 @@ const LoginForm = () => {
 
   const handleSubmit = async (values) => {
     const response = await login(values);
-    if (response) router.replace(`../../(${userDetails.usertype})`);
+    if (response) {
+      console.log("userdetails after session created", userDetails);
+      router.replace(`../../(${userDetails.usertype})`);
+    }
   };
 
   return (

@@ -7,6 +7,7 @@ const GlobalContext = createContext(undefined);
 export const GlobalProvider = ({ children }) => {
   const {
     data: userDetails,
+    user,
     loading,
     refetch,
   } = useAppwrite({ fn: getCurrentUser });
@@ -14,7 +15,7 @@ export const GlobalProvider = ({ children }) => {
   const isLoggedIn = !!userDetails;
 
   return (
-    <GlobalContext.Provider value={{ isLoggedIn, userDetails, loading }}>
+    <GlobalContext.Provider value={{ isLoggedIn, userDetails, user, loading }}>
       {children}
     </GlobalContext.Provider>
   );
