@@ -14,7 +14,7 @@ const GetStarted = () => {
               <CustomButton onPress={() => router.push('/SelectUserType')} text='Lets Get Started'/>
                     <View className='flex flex-row justify-center'>
                     <Text>Already have an account? </Text>
-                        <TouchableOpacity onPress={() => router.push('Login')}>
+                        <TouchableOpacity onPress={() => router.push('/auth/Login')}>
 
                         < Text className='underline'>Sign In</Text>
                         </TouchableOpacity>

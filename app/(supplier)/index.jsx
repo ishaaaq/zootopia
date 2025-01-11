@@ -16,13 +16,10 @@ const SupplierHome = () => {
   const router = useRouter();
 
   // Placeholder function to add a new animal (for testing purposes)
-  const addAnimal = () => {
+  const addAnimal = (animal) => {
     const newAnimal = {
       id: animals.length + 1,
-      name: `Animal ${animals.length + 1}`,
-      species: "Lion",
-      age: `${Math.floor(Math.random() * 10) + 1} years`,
-      image: "https://via.placeholder.com/150",
+      ...animal,
     };
     setAnimals([...animals, newAnimal]);
   };
@@ -57,7 +54,7 @@ const SupplierHome = () => {
           />
           <Text className="text-lg text-gray-600 text-center mb-6">
             No animals found. Click the "Add Animal" button to add your first
-            animal.
+            animal to the marketplace.
           </Text>
           <TouchableOpacity
             className="flex-row items-center justify-center bg-primary-300 rounded-lg px-6 py-3"
@@ -78,7 +75,7 @@ const SupplierHome = () => {
           ListFooterComponent={
             <TouchableOpacity
               className="flex-row items-center justify-center bg-primary-300 rounded-lg px-6 py-3 mt-4"
-              onPress={() => router.push("/add-animal")}
+              onPress={() => router.push("../AddAnimal")}
             >
               <Ionicons name="add-circle" size={24} color="#fff" />
               <Text className="text-white text-lg font-semibold ml-2">

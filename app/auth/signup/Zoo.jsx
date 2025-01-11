@@ -10,17 +10,34 @@ import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
-import InputField from "../components/InputField";
+import InputField from "../../../components/InputField";
 import FormButton from "@/components/FormButton";
-const PetSupplierSignupForm = () => {
+import { signup } from "@/lib/AppWrite";
+import { useRouter } from "expo-router";
+
+const ZooSignupForm = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState({
     password: false,
     confirmPassword: false,
   });
 
+  const initialValues = {
+    zooName: "",
+    zooLocation: "",
+    registrationNumber: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+    confirmPassword: "",
+  };
+
   const validationSchema = Yup.object().shape({
-    businessName: Yup.string().required("Business Name is required"),
-    licenseNumber: Yup.string().required("License Number is required"),
+    zooName: Yup.string().required("Zoo Name is required"),
+    zooLocation: Yup.string().required("Zoo Location is required"),
+    registrationNumber: Yup.string().required(
+      "Registration Number is required"
+    ),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
@@ -35,18 +52,27 @@ const PetSupplierSignupForm = () => {
       .required("Confirm Password is required"),
   });
 
+  const zooLocations = [
+    "Abuja",
+    "Lagos",
+    "Port Harcourt",
+    "Kano",
+    "Ogun",
+    "Enugu",
+    "Kaduna",
+    "Benin City",
+  ];
+
+  const handleSubmit = async (values) => {
+    const response = await signup("zoo", values);
+    if (response) router.replace("(zoo)");
+  };
+
   return (
     <Formik
-      initialValues={{
-        businessName: "",
-        licenseNumber: "",
-        email: "",
-        phoneNumber: "",
-        password: "",
-        confirmPassword: "",
-      }}
+      initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(values) => console.log(values)}
+      onSubmit={(values) => handleSubmit(values)}
     >
       {({
         values,
@@ -59,31 +85,51 @@ const PetSupplierSignupForm = () => {
         <ScrollView className="p-4 bg-white">
           <View className="mb-5 mt-10">
             <Text className="font-bold text-4xl text-center">
-              Supplier Signup
+              Create Zoo Account
             </Text>
             <Text className="font-light text-center text-gray-500">
-              Fill the information below to register your seller account.{" "}
+              Sign up with the details of your zoo
             </Text>
           </View>
 
           <InputField
-            name="businessName"
-            title="Business Name"
-            placeholder="Best Pet Supplies"
-            value={values.businessName}
-            onChangeText={handleChange("businessName")}
-            onBlur={handleBlur("businessName")}
-            errorMessage={touched.businessName && errors.businessName}
+            name="zooName"
+            title="Zoo Name"
+            placeholder="Aldusar park and zoo"
+            value={values.zooName}
+            onChangeText={handleChange("zooName")}
+            onBlur={handleBlur("zooName")}
+            errorMessage={touched.zooName && errors.zooName}
           />
 
+          <View className="mb-4">
+            <Text className="text-gray-700 font-bold">Zoo Location</Text>
+            <Picker
+              selectedValue={values.zooLocation}
+              onValueChange={handleChange("zooLocation")}
+              onBlur={handleBlur("zooLocation")}
+              className="border p-2 rounded-full"
+            >
+              <Picker.Item label="Select a Location" value="" />
+              {zooLocations.map((location) => (
+                <Picker.Item key={location} label={location} value={location} />
+              ))}
+            </Picker>
+            {touched.zooLocation && errors.zooLocation && (
+              <Text className="text-red-500">{errors.zooLocation}</Text>
+            )}
+          </View>
+
           <InputField
-            name="licenseNumber"
-            title="License Number"
-            placeholder="123456789"
-            value={values.licenseNumber}
-            onChangeText={handleChange("licenseNumber")}
-            onBlur={handleBlur("licenseNumber")}
-            errorMessage={touched.licenseNumber && errors.licenseNumber}
+            name="registrationNumber"
+            title="Registration Number"
+            placeholder="9156872NG"
+            value={values.registrationNumber}
+            onChangeText={handleChange("registrationNumber")}
+            onBlur={handleBlur("registrationNumber")}
+            errorMessage={
+              touched.registrationNumber && errors.registrationNumber
+            }
           />
 
           <InputField
@@ -138,11 +184,11 @@ const PetSupplierSignupForm = () => {
             }
           />
 
-          <FormButton title="Sign Up" onPress={handleSubmit} />
+          <FormButton title="Sign up" onPress={handleSubmit} />
         </ScrollView>
       )}
     </Formik>
   );
 };
 
-export default PetSupplierSignupForm;
+export default ZooSignupForm;

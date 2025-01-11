@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import FilterModal from "@/components/FilterModal";
 import sellers from "@/lib/data";
 import { useRouter } from "expo-router";
+import { useGlobalContext } from "@/lib/global-provider";
 
 const index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +18,7 @@ const index = () => {
   const { animals } = useAnimals();
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const router = useRouter();
+  const { userDetails } = useGlobalContext();
   const toggleFilterModal = () => {
     setFilterModalVisible(!isFilterModalVisible);
   };
@@ -43,6 +45,8 @@ const index = () => {
           />
         </View>
       </View>
+      <Text className="text-3xl font-tc-bold mt-auto">{`Hello ${userDetails?.zooname}`}</Text>
+
       <View className="flex flex-row justify-between mt-4 px-4">
         <SearchBar
           value={searchQuery}

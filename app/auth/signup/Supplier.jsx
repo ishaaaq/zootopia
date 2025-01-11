@@ -10,16 +10,17 @@ import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
-import InputField from "../components/InputField";
+import InputField from "@/components/InputField";
 import FormButton from "@/components/FormButton";
-const PetBuyerSignupForm = () => {
+const PetSupplierSignupForm = () => {
   const [showPassword, setShowPassword] = useState({
     password: false,
     confirmPassword: false,
   });
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
+    businessName: Yup.string().required("Business Name is required"),
+    licenseNumber: Yup.string().required("License Number is required"),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
@@ -37,7 +38,8 @@ const PetBuyerSignupForm = () => {
   return (
     <Formik
       initialValues={{
-        name: "",
+        businessName: "",
+        licenseNumber: "",
         email: "",
         phoneNumber: "",
         password: "",
@@ -57,21 +59,31 @@ const PetBuyerSignupForm = () => {
         <ScrollView className="p-4 bg-white">
           <View className="mb-5 mt-10">
             <Text className="font-bold text-4xl text-center">
-              Create Account
+              Supplier Signup
             </Text>
             <Text className="font-light text-center text-gray-500">
-              Fill the information below to register your account.{" "}
+              Fill the information below to register your seller account.{" "}
             </Text>
           </View>
 
           <InputField
-            name="name"
-            title="Name"
-            placeholder="John Doe"
-            value={values.name}
-            onChangeText={handleChange("name")}
-            onBlur={handleBlur("name")}
-            errorMessage={touched.name && errors.name}
+            name="businessName"
+            title="Business Name"
+            placeholder="Best Pet Supplies"
+            value={values.businessName}
+            onChangeText={handleChange("businessName")}
+            onBlur={handleBlur("businessName")}
+            errorMessage={touched.businessName && errors.businessName}
+          />
+
+          <InputField
+            name="licenseNumber"
+            title="License Number"
+            placeholder="123456789"
+            value={values.licenseNumber}
+            onChangeText={handleChange("licenseNumber")}
+            onBlur={handleBlur("licenseNumber")}
+            errorMessage={touched.licenseNumber && errors.licenseNumber}
           />
 
           <InputField
@@ -132,4 +144,5 @@ const PetBuyerSignupForm = () => {
     </Formik>
   );
 };
-export default PetBuyerSignupForm;
+
+export default PetSupplierSignupForm;

@@ -10,12 +10,14 @@ import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
-import InputField from "../components/InputField";
-import FormButton from "../components/FormButton";
+import InputField from "@/components/InputField";
+import FormButton from "@/components/FormButton";
 import { router } from "expo-router";
-
+import { login } from "@/lib/AppWrite";
+import { useGlobalContext } from "@/lib/global-provider";
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const { userDetails } = useGlobalContext();
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Invalid email format")
@@ -25,9 +27,9 @@ const LoginForm = () => {
       .required("Password is required"),
   });
 
-  const handleSubmit = () => {
-    console.log("Login button pressed");
-    router.replace("/HomePage");
+  const handleSubmit = async (values) => {
+    const response = await login(values);
+    if (response) router.replace(`../../(${userDetails.usertype})`);
   };
 
   return (
@@ -37,7 +39,7 @@ const LoginForm = () => {
         password: "",
       }}
       validationSchema={validationSchema}
-      onSubmit={handleSubmit}
+      onSubmit={(values) => handleSubmit(values)}
     >
       {({
         values,
