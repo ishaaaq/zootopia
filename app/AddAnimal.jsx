@@ -17,8 +17,9 @@ import { InputField } from "../components/NewInput";
 import { useGlobalContext } from "@/lib/global-provider";
 import { addAnimal } from "@/lib/AppWrite";
 import sadpup from "@/assets/images/animals/criollo.jpg";
+import { launchImageLibrary } from "react-native-image-picker";
 const AddAnimal = () => {
-  const [photo, setPhoto] = useState(sadpup);
+  const [photo, setPhoto] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [successVisible, setSuccessVisible] = useState(false);
   const { userDetails, user } = useGlobalContext();
@@ -30,6 +31,31 @@ const AddAnimal = () => {
     const supplierId = userDetails.$id;
     const response = await addAnimal(supplierId, photo, values);
     if (response) setSuccessVisible(true);
+  };
+
+  const selectImageFromGallery = async () => {
+    try {
+      setModalVisible(false);
+
+      const result = await launchImageLibrary({
+        mediaType: "photo",
+        quality: 1,
+      });
+
+      if (!result.didCancel && result.assets) {
+        const file = result.assets[0];
+        console.log("file:", file);
+        return {
+          uri: file.uri,
+          name: "image.jpg",
+          type: "image/jpeg", // MIME type (e.g., image/jpeg)
+        };
+      }
+
+      throw new Error("Image selection canceled");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const validationSchema = Yup.object({
@@ -260,7 +286,7 @@ const AddAnimal = () => {
         <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
           <View className="bg-white w-4/5 p-4 rounded-lg">
             <Text className="text-center font-bold mb-4">Add a Photo</Text>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               className="p-4 border-b border-gray-300"
               onPress={() => {
                 setPhoto("camera-photo-uri"); // Placeholder URI
@@ -268,12 +294,11 @@ const AddAnimal = () => {
               }}
             >
               <Text className="text-center text-blue-500">Camera</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               className="p-4 border-b border-gray-300"
-              onPress={() => {
-                setPhoto("gallery-photo-uri"); // Placeholder URI
-                setModalVisible(false);
+              onPress={async () => {
+                setPhoto(await selectImageFromGallery());
               }}
             >
               <Text className="text-center text-blue-500">Gallery</Text>

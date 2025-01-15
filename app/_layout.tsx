@@ -14,10 +14,10 @@ const RootLayout = () => {
 
     const router = useRouter();
 
-    // useEffect(() => {
-    //   // Redirect to Zoo UI on app launch
-    //   router.replace('/GetStarted');
-    // }, []);
+    useEffect(() => {
+      // Redirect to Zoo UI on app launch
+      router.replace('/(supplier)');
+    }, []);
 
     if(!fontsLoaded) return null
     return (
