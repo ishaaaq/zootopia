@@ -3,7 +3,7 @@ import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
 import {useFonts}from "expo-font"
 import { Stack, useRouter } from 'expo-router';
-import { SellersProvider } from '../lib/SellersProvider';
+import { SupplierAnimalsProvider } from '@/lib/SupplierAnimalsProvider';
 import { AnimalsProvider } from '@/lib/AnimalsProvider';
 import { GlobalProvider} from '@/lib/global-provider'
 const RootLayout = () => {
@@ -24,9 +24,9 @@ const RootLayout = () => {
         <>
         <AnimalsProvider>
 
-        <SellersProvider>
+       
             <GlobalProvider>
-
+            <SupplierAnimalsProvider>
             
             <Stack>
                  <Stack.Screen name="GetStarted" options={{ headerShown: false }} />
@@ -34,6 +34,7 @@ const RootLayout = () => {
                 <Stack.Screen name="(buyer)" options={{ headerShown: false }} />
                 <Stack.Screen name="(supplier)" options={{ headerShown: false }} />
                 <Stack.Screen name="AddAnimal" options={{ headerShown: false }} />
+                <Stack.Screen name="EditAnimal" options={{ headerShown: false }} />
                 <Stack.Screen name="EditProfile" options={{ headerShown: false }} />
                 <Stack.Screen name="AnimalDetails" options={{ headerShown: false }} />
                 <Stack.Screen name="SelectUserType"  options={{ headerShown: false }}/>
@@ -42,8 +43,9 @@ const RootLayout = () => {
                 <Stack.Screen name="auth/signup/Supplier"  options={{ headerShown: false }}/>
                 <Stack.Screen name="auth/Login"  options={{ headerShown: false }}/>
             </Stack>
+            </SupplierAnimalsProvider>
             </GlobalProvider>
-            </SellersProvider>
+           
         </AnimalsProvider>
            
 

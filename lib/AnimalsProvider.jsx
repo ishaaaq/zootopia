@@ -1,6 +1,4 @@
 import React, { createContext, useContext, useState } from "react";
-import panda from "@/assets/images/panda.jpg";
-import deer from "@/assets/images/animals/deer1.jpg";
 import { useAppwrite } from "./UseAppwrite";
 import { fetchAllAnimals } from "./AppWrite";
 // Create the context

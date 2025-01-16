@@ -18,6 +18,7 @@ import { useGlobalContext } from "@/lib/global-provider";
 import { addAnimal } from "@/lib/AppWrite";
 import sadpup from "@/assets/images/animals/criollo.jpg";
 import { launchImageLibrary } from "react-native-image-picker";
+import { DropdownField } from "../components/NewInput";
 const AddAnimal = () => {
   const [photo, setPhoto] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -73,47 +74,6 @@ const AddAnimal = () => {
     longDescription: Yup.string().required("Long description is required"),
     breed: Yup.string(), // Optional field
   });
-
-  const initialValues = {
-    name: "",
-    type: "",
-    category: "",
-    breed: "",
-    shortDescription: "",
-    quantity: "",
-    price: "",
-    longDescription: "",
-  };
-
-  const DropdownField = ({
-    label,
-    selectedValue,
-    onValueChange,
-    options,
-    error,
-    touched,
-  }) => (
-    <View className="mb-6">
-      <Text className="text-gray-700 mb-2">{label}</Text>
-      <View className="bg-white rounded-lg border border-gray-300 h-13 flex justify-center">
-        <Picker
-          selectedValue={selectedValue}
-          onValueChange={onValueChange}
-          className="h-13"
-        >
-          <Picker.Item label={`Select ${label.toLowerCase()}`} value="" />
-          {options.map((option, index) => (
-            <Picker.Item
-              key={index}
-              label={option.label}
-              value={option.value}
-            />
-          ))}
-        </Picker>
-      </View>
-      {touched && error && <Text className="text-red-500 mt-2">{error}</Text>}
-    </View>
-  );
 
   return (
     <ScrollView className="flex-1 bg-gray-100 p-4 mb-15">

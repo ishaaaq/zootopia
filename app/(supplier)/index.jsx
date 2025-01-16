@@ -7,23 +7,44 @@ import {
   TouchableOpacity,
   StatusBar,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { fetchAnimalsForCurrentUser } from "@/lib/AppWrite";
-
+import { useSupplierAnimals } from "@/lib/SupplierAnimalsProvider";
 const SupplierHome = () => {
   const router = useRouter();
   const [animals, setAnimals] = useState([]);
+  const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchAnimalsForCurrentUser();
-      setAnimals(data);
-    };
+    if (supplierAnimals) {
+      setAnimals(supplierAnimals);
+    }
+  }, [supplierAnimals]);
+  console.log("supplier animls b4 animals", supplierAnimals);
+  console.log("Animals", animals);
 
-    fetchData();
-  }, []);
+  if (loading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error) {
+    return <Text>Error: {error.message}</Text>;
+  }
+
+  // if (!animals) {
+  //   return <Text>WHy arent there any animals here!!???</Text>;
+  // }
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const data = await fetchAnimalsForCurrentUser();
+  //     setAnimals(data);
+  //   };
+
+  //   fetchData();
+  // }, []);
 
   const renderAnimalCard = ({ item }) => (
     <View className="flex-row bg-gray-100 rounded-lg p-4 mb-4 items-center">
@@ -38,7 +59,9 @@ const SupplierHome = () => {
         </Text>
         <Text className="text-lg font-bold text-primary-800">{`N${item.price}`}</Text>
       </View>
-      <TouchableOpacity onPress={() => router.push("../EditAnimal")}>
+      <TouchableOpacity
+        onPress={() => router.push(`/EditAnimal?animalId=${item.$id}`)}
+      >
         <Ionicons name="create-outline" size={30} color="grey" />
       </TouchableOpacity>
     </View>
