@@ -9,7 +9,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     await logout();
-    router.replace("../signup/Login");
+    return router.replace("../auth/Login");
   };
   return (
     <View className="flex-1 bg-white ">

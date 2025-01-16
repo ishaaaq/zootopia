@@ -8,7 +8,7 @@ const SearchBar = ({
   placeholder = "Search animals...",
 }) => {
   return (
-    <View className="flex-row items-center bg-gray-100 p-3 rounded-xl mb-4 w-70 h-13">
+    <View className="flex-row items-center bg-gray-100 p-3 rounded-xl mb-4 w-65 h-13">
       <Ionicons name="search" size={20} color="gray" className="mr-2" />
       <TextInput
         className="flex-1 text-gray-700 w-100 h-full outline-none"

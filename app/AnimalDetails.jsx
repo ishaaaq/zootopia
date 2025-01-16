@@ -9,41 +9,46 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { useSellers } from "@/lib/SellersProvider";
 import sellers from "@/lib/data";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAnimals } from "@/lib/AnimalsProvider";
 const AnimalDetails = () => {
   const { sellerId, animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
   const [seller, setSeller] = useState();
   const [quantity, setQuantity] = useState(1);
+  const { animalsData, loading } = useAnimals();
 
   useEffect(() => {
-    if (sellerId && animalId) {
-      const seller = sellers.find((seller) => seller.id === Number(sellerId));
-      if (seller) {
-        const animal = seller.animals.find(
-          (animal) => animal.id === Number(animalId)
-        );
-        if (animal) {
-          setSeller(seller);
-          setAnimal(animal);
-        } else {
-          console.error("Animal not found");
-        }
-      } else {
-        console.error("Seller not found");
-      }
-    }
-  }, [sellerId, animalId, sellers]);
+    const animal = animalsData.find((animal) => animal.$id === animalId);
+    setAnimal(animal);
+    setSeller(animal.supplier);
+  }, [animalId]);
+
+  // useEffect(() => {
+  //   if (sellerId && animalId) {
+  //     const seller = sellers.find((seller) => seller.id === Number(sellerId));
+  //     if (seller) {
+  //       const animal = seller.animals.find(
+  //         (animal) => animal.id === Number(animalId)
+  //       );
+  //       if (animal) {
+  //         setSeller(seller);
+  //         setAnimal(animal);
+  //       } else {
+  //         console.error("Animal not found");
+  //       }
+  //     } else {
+  //       console.error("Seller not found");
+  //     }
+  //   }
+  // }, [sellerId, animalId, sellers]);
 
   if (!animal || !seller) {
-    return (
-      <View className="flex-1 bg-white p-4">
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <ActivityIndicator color="#CE4B26" size="large" />;
   }
   const totalPrice = animal.price * quantity;
   return (
@@ -75,13 +80,16 @@ const AnimalDetails = () => {
             className="mt-[-40px] w-full rounded-t-3xl bg-gray-100 p-4"
           >
             <Text className="text-2xl font-bold text-gray-800">
-              {`Handsome ${animal.name} with awesome features like 4 legs and 1 cool looking tail`}
+              {animal.shortDescription}
             </Text>
             <View className="flex flex-row justify-between bg-yellow w-100% mt-4">
               {[
                 { label: "Quantity", value: animal.quantity },
                 { label: "Price", value: `$${animal.price}` },
-                { label: "Breed", value: animal.specie },
+                {
+                  label: animal.breed !== "" ? "Breed" : "Category",
+                  value: animal.breed !== "" ? animal.breed : animal.category,
+                },
               ].map((item, index) => (
                 <View
                   key={index}
@@ -126,16 +134,7 @@ const AnimalDetails = () => {
             </View>
             <Text className="text-lg text-gray-800 mt-2">Description:</Text>
             <Text className="text-sm text-gray-800">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially unchanged. It was
-              popularised in the 1960s with the release of Letraset sheets
-              containing Lorem Ipsum passages, and more recently with desktop
-              publishing software like Aldus PageMaker including versions of
-              Lorem Ipsum.
+              {animal.longDescription}
             </Text>
             {/* Quantity Picker */}
             <View className="flex-row justify-between my-4">
