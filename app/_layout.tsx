@@ -14,10 +14,10 @@ const RootLayout = () => {
 
     const router = useRouter();
 
-    // useEffect(() => {
-    //   // Redirect to Zoo UI on app launch
-    //   router.replace('/(zoo)');
-    // }, []);
+    useEffect(() => {
+      // Redirect to Zoo UI on app launch
+      router.replace('/(supplier)');
+    }, []);
 
     if(!fontsLoaded) return null
     return (
@@ -37,6 +37,7 @@ const RootLayout = () => {
                 <Stack.Screen name="EditAnimal" options={{ headerShown: false }} />
                 <Stack.Screen name="EditProfile" options={{ headerShown: false }} />
                 <Stack.Screen name="AnimalDetails" options={{ headerShown: false }} />
+                <Stack.Screen name="MyAnimalDetails" options={{ headerShown: false }} />
                 <Stack.Screen name="SelectUserType"  options={{ headerShown: false }}/>
                 <Stack.Screen name="auth/signup/Zoo"  options={{ headerShown: false }}/>
                 <Stack.Screen name="auth/signup/PetBuyer" options={{ headerShown: false }}/>

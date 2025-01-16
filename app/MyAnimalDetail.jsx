@@ -5,31 +5,53 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  Button,
+  Modal,
   SafeAreaView,
   StatusBar,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useAnimals } from "@/lib/AnimalsProvider";
+import { useSupplierAnimals } from "@/lib/SupplierAnimalsProvider";
+import { deleteAnimal } from "@/lib/AppWrite";
 const AnimalDetails = () => {
-  const { sellerId, animalId } = useLocalSearchParams();
+  const { animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
-  const [seller, setSeller] = useState();
-  const [quantity, setQuantity] = useState(1);
-  const { animalsData, loading } = useAnimals();
+  const { supplierAnimals, loading, error } = useSupplierAnimals();
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    const animal = animalsData.find((animal) => animal.$id === animalId);
+    const animal = supplierAnimals.find((animal) => animal.$id === animalId);
     setAnimal(animal);
-    setSeller(animal.supplier);
   }, [animalId]);
 
-  if (!animal || !seller) {
+  const handleDelete = async () => {
+    try {
+      await deleteAnimal(animal.$id);
+      Alert.alert("Success", "Animal deleted successfully");
+      setModalVisible(false);
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View className="mx-auto my-auto">
+        <Text>loading</Text>
+        <ActivityIndicator color="#CE4B26" size="large" />
+      </View>
+    );
+  }
+  if (error) {
+    return <Text>Error: {error.message}</Text>;
+  }
+
+  if (!animal) {
     return <ActivityIndicator color="#CE4B26" size="large" />;
   }
-  const totalPrice = animal.price * quantity;
+
   return (
     <>
       <SafeAreaView
@@ -41,7 +63,7 @@ const AnimalDetails = () => {
           {/* Animal Image */}
           <View style={{ height: "50%", width: "100%" }} className="relative">
             <Image
-              source={animal.image}
+              source={{ uri: animal.image }}
               style={{ resizeMode: "cover", height: "100%", width: "100%" }}
             />
             <TouchableOpacity
@@ -85,69 +107,65 @@ const AnimalDetails = () => {
               ))}
             </View>
 
-            {/* Seller Info */}
-            <View className="flex-row justify-between items-center mt-4 bg-white h-20 p-2">
-              <View
-                style={{ width: 170 }}
-                className="flex flex-row items-center justify-between"
-              >
-                <Ionicons name="person" color="gray" size={35} />
-                <View className="flex flex-col">
-                  <Text className="text-lg font-tc text-gray-600">
-                    Owned By:
-                  </Text>
-                  <Text className="text-lg font-tc-bold text-black">
-                    {seller.name}
-                  </Text>
-                </View>
-              </View>
-              <TouchableOpacity
-                onPress={() => console.log("Navigate to Inbox")}
-              >
-                <MaterialCommunityIcons
-                  name="message"
-                  size={30}
-                  color="#CE4B26"
-                />
-              </TouchableOpacity>
-            </View>
             <Text className="text-lg text-gray-800 mt-2">Description:</Text>
             <Text className="text-sm text-gray-800">
               {animal.longDescription}
             </Text>
-            {/* Quantity Picker */}
-            <View className="flex-row justify-between my-4">
-              <View className="flex-row items-center my-4">
-                <Text className="text-lg text-gray-800 mr-4">Quantity:</Text>
-                <View className="flex-row items-center border rounded-md mr-5">
-                  <Button
-                    title="-"
-                    onPress={() => setQuantity(Math.max(1, quantity - 1))}
-                  />
-                  <Text className="mx-2">{quantity}</Text>
-                  <Button title="+" onPress={() => setQuantity(quantity + 1)} />
-                </View>
-              </View>
-              {/* Total Price */}
-              <View className="flex-row items-center">
-                <Text className="text-lg text-gray-800 ml-4 mr-4">
-                  Total Price:
-                </Text>
-                <Text className="text-xl text-primary font-tc-bold my-auto">{`$${totalPrice}`}</Text>
-              </View>
-            </View>
             {/* Buy Now Button */}
-            <TouchableOpacity className="bg-primary rounded-md py-3 mt-3 flex-row items-center justify-center">
-              <Ionicons name="cart" size={25} color="white" />
+            <TouchableOpacity
+              onPress={() => router.push(`/EditAnimal?animalId=${animal.$id}`)}
+              className="bg-primary rounded-md py-3 mt-3 flex-row items-center justify-center"
+            >
+              <Ionicons name="create-outline" size={25} color="white" />
               <Text
                 className="text-white text-center text-lg "
                 style={{ marginLeft: 10 }}
               >
-                Proceed to checkout
+                Edit
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              className="bg-red-500 rounded-md py-3 mt-3 flex-row items-center justify-center"
+            >
+              <Ionicons name="trash" size={25} color="white" />
+              <Text
+                className="text-white text-center text-lg "
+                style={{ marginLeft: 10 }}
+              >
+                Delete
               </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+            <View className="bg-white rounded-lg p-6 w-80">
+              <Text className="text-lg font-bold mb-4 text-center">
+                Are you sure you want to delete this animal?
+              </Text>
+              <View className="flex-row justify-between">
+                <TouchableOpacity
+                  className="bg-gray-300 p-2 rounded-lg flex-1 mr-2"
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text className="text-center text-white">Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  className="bg-red-500 p-2 rounded-lg flex-1 ml-2"
+                  onPress={handleDelete}
+                >
+                  <Text className="text-center text-white">Yes</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </>
   );

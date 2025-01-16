@@ -21,8 +21,7 @@ const EditAnimal = () => {
   const { animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
   const { supplierAnimals, loading, error } = useSupplierAnimals();
-  console.log("spu anms:", supplierAnimals);
-  console.log("animalId:", animalId);
+
   useEffect(() => {
     const animal = supplierAnimals.find((animal) => animal.$id === animalId);
     setAnimal(animal);
@@ -67,12 +66,13 @@ const EditAnimal = () => {
     }
   };
   if (!animal) {
-    return <Text>WHy arent there any animals here!!???</Text>;
+    return <ActivityIndicator color="#CE4B26" size="large" />;
   }
 
   if (loading) {
     return (
       <View className="mx-auto my-auto">
+        <Text>loading</Text>
         <ActivityIndicator color="#CE4B26" size="large" />
       </View>
     );
@@ -205,7 +205,7 @@ const EditAnimal = () => {
               className="mb-4"
             />
             <Button
-              label={isSubmitting ? <ActivityIndicator /> : "Save"}
+              title={isSubmitting ? <ActivityIndicator /> : "Save"}
               onPress={handleSubmit}
               disabled={isSubmitting}
               className="bg-primary-500 text-white py-2 px-4 rounded-lg "

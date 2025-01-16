@@ -58,6 +58,16 @@ const AddAnimal = () => {
       console.log(error);
     }
   };
+  const initialValues = {
+    name: "",
+    type: "",
+    category: "",
+    breed: "",
+    shortDescription: "",
+    quantity: "",
+    price: "",
+    longDescription: "",
+  };
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),

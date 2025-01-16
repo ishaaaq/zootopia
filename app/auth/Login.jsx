@@ -17,7 +17,7 @@ import { login } from "@/lib/AppWrite";
 import { useGlobalContext } from "@/lib/global-provider";
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { userDetails } = useGlobalContext();
+  const { setUserDetails } = useGlobalContext();
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Invalid email format")
@@ -28,10 +28,15 @@ const LoginForm = () => {
   });
 
   const handleSubmit = async (values) => {
-    const response = await login(values);
-    if (response && userDetails) {
-      console.log("userdetails after session created", userDetails);
-      return router.replace(`../../(${userDetails.usertype})`);
+    try {
+      const response = await login(values);
+      if (response) {
+        const userDetails = await getCurrentUser();
+        setUserDetails(userDetails); // Update the global context with user details
+        router.replace(`../../(${userDetails.usertype})`);
+      }
+    } catch (error) {
+      Alert.alert("Login Error", error.message);
     }
   };
 

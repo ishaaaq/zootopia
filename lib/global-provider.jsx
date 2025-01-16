@@ -1,21 +1,18 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { useAppwrite } from "./UseAppwrite";
 import { getCurrentUser } from "./AppWrite";
 
 const GlobalContext = createContext(undefined);
 
 export const GlobalProvider = ({ children }) => {
-  const {
-    data: userDetails,
-    user,
-    loading,
-    refetch,
-  } = useAppwrite({ fn: getCurrentUser });
-
+  const { data, user, loading, refetch } = useAppwrite({ fn: getCurrentUser });
+  const [userDetails, setUserDetails] = useState(data);
   const isLoggedIn = !!userDetails;
 
   return (
-    <GlobalContext.Provider value={{ isLoggedIn, userDetails, user, loading }}>
+    <GlobalContext.Provider
+      value={{ isLoggedIn, userDetails, setUserDetails, user, loading }}
+    >
       {children}
     </GlobalContext.Provider>
   );

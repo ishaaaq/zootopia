@@ -11,10 +11,11 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchAnimalsForCurrentUser } from "@/lib/AppWrite";
 import { useSupplierAnimals } from "@/lib/SupplierAnimalsProvider";
+import { useGlobalContext } from "@/lib/global-provider";
 const SupplierHome = () => {
   const router = useRouter();
+  const { userDetails } = useGlobalContext();
   const [animals, setAnimals] = useState([]);
   const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
 
@@ -23,31 +24,24 @@ const SupplierHome = () => {
       setAnimals(supplierAnimals);
     }
   }, [supplierAnimals]);
-  console.log("supplier animls b4 animals", supplierAnimals);
-  console.log("Animals", animals);
 
   if (loading) {
-    return <ActivityIndicator />;
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#CE4B26" />
+      </View>
+    );
   }
 
   if (error) {
     return <Text>Error: {error.message}</Text>;
   }
 
-  // if (!animals) {
-  //   return <Text>WHy arent there any animals here!!???</Text>;
-  // }
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const data = await fetchAnimalsForCurrentUser();
-  //     setAnimals(data);
-  //   };
-
-  //   fetchData();
-  // }, []);
-
   const renderAnimalCard = ({ item }) => (
-    <View className="flex-row bg-gray-100 rounded-lg p-4 mb-4 items-center">
+    <TouchableOpacity
+      onPress={() => router.push(`/MyAnimalDetail?animalId=${item.$id}`)}
+      className="flex-row bg-gray-100 rounded-lg p-4 mb-4 items-center"
+    >
       <Image
         source={{ uri: item.image }}
         className="w-12 h-12 rounded-lg mr-4"
@@ -64,13 +58,15 @@ const SupplierHome = () => {
       >
         <Ionicons name="create-outline" size={30} color="grey" />
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
     <SafeAreaView className="flex-1 bg-white px-6 py-4">
-      <StatusBar backgroundColor="#61dafb" />
-      <Text className="text-2xl text-gray-900 mb-6">Hello Seller</Text>
+      <StatusBar backgroundColor="#CE4B26" />
+      <Text className="text-2xl text-gray-900 mb-6">{`Hello ${
+        userDetails ? userDetails.name : "Seller"
+      }`}</Text>
       <Text className="text-3xl font-bold text-gray-900 mb-6">My Animals</Text>
 
       {animals.length === 0 ? (
