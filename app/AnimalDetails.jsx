@@ -13,18 +13,53 @@ import {
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAnimals } from "@/lib/AnimalsProvider";
+import { databases, config, getConversations } from "@/lib/AppWrite";
+import { useGlobalContext } from "@/lib/global-provider";
 const AnimalDetails = () => {
   const { sellerId, animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
   const [seller, setSeller] = useState();
   const [quantity, setQuantity] = useState(1);
   const { animalsData, loading } = useAnimals();
+  const { userDetails } = useGlobalContext();
 
   useEffect(() => {
     const animal = animalsData.find((animal) => animal.$id === animalId);
     setAnimal(animal);
     setSeller(animal.supplier);
   }, [animalId]);
+
+  const handleStartChat = async () => {
+    console.log("A", sellerId);
+    console.log("B", seller);
+    // Check if a conversation already exists with the user
+    const conversations = await getConversations();
+    let conversation = conversations.find((conv) =>
+      conv.participants.includes(seller.$id)
+    );
+
+    if (!conversation) {
+      // Create a new conversation
+      conversation = await databases.createDocument(
+        config.database,
+        config.conversation,
+        "unique()",
+        {
+          participants: [userDetails.$id, seller.$id],
+          timestamp: new Date(),
+        }
+      );
+    }
+
+    // navigation.navigate("ChatScreen", {
+    //   conversationId: conversation.$id,
+    //   senderId: "currentUserId",
+    // });
+
+    return router.push(
+      `/ChatScreen?conversationId=${conversation.$id}&receiverId=${seller.$id}&senderId=${userDetails.$id}`
+    );
+  };
 
   if (!animal || !seller) {
     return <ActivityIndicator color="#CE4B26" size="large" />;
@@ -101,9 +136,7 @@ const AnimalDetails = () => {
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity
-                onPress={() => console.log("Navigate to Inbox")}
-              >
+              <TouchableOpacity onPress={handleStartChat}>
                 <MaterialCommunityIcons
                   name="message"
                   size={30}

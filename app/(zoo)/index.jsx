@@ -67,7 +67,7 @@ const Index = () => {
   useEffect(() => {
     setAnimals(animalsData);
     setFilteredAnimals(animalsData);
-  }, []);
+  }, [animalsData]);
 
   // Reapply filters when filters are changed
   useEffect(() => {
@@ -82,6 +82,11 @@ const Index = () => {
       setFilteredAnimals(animals);
     }
   }, [searchQuery, selectedSpecies, priceRange, selectedCategories]);
+
+  console.log("animalsData:", animalsData);
+  console.log("userdetails:", userDetails);
+  console.log("animals", animals);
+  console.log("filered animals", filteredAnimals);
 
   return (
     <ScrollView className="flex-1 bg-white p-4">
@@ -98,7 +103,11 @@ const Index = () => {
       </View>
 
       {/* Greeting */}
-      <Text className="text-3xl font-tc-bold mt-auto">{`Hello ${userDetails?.zooname}`}</Text>
+      {userDetails ? (
+        <Text className="text-3xl font-tc-bold mt-auto">{`Hello ${userDetails?.zooname}`}</Text>
+      ) : (
+        <ActivityIndicator size="small" color="#CE4B26" />
+      )}
 
       {/* Search Bar */}
       <View className="flex flex-row justify-between mt-4 px-4">
