@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { getConversations } from "@/lib/AppWrite";
 import { useGlobalContext } from "@/lib/global-provider";
-import { usePusher } from "../../lib/usePusher";
 import { router } from "expo-router";
+
 const Messages = () => {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,16 +30,6 @@ const Messages = () => {
     fetchConversations();
   }, []);
 
-  usePusher("conversations", "new-message", (data) => {
-    setConversations((prevConversations) =>
-      prevConversations.map((conversation) =>
-        conversation.$id === data.conversationId
-          ? { ...conversation, lastMessage: data.message }
-          : conversation
-      )
-    );
-  });
-
   const openConversation = (conversationId, senderId) => {
     router.push({
       pathname: "/ChatScreen",
@@ -43,8 +39,8 @@ const Messages = () => {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-white p-4">
-        <Text className="text-lg text-gray-500">Loading...</Text>
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#CE4B26" />
       </View>
     );
   }
@@ -59,7 +55,7 @@ const Messages = () => {
 
   return (
     <View className="flex-1 bg-white p-4">
-      <Text className="text-xl font-bold mb-4">Messages</Text>
+      <Text className="text-xl tc-bold mb-4">Messages</Text>
       <FlatList
         data={conversations}
         keyExtractor={(item) => item.$id}

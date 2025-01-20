@@ -79,7 +79,7 @@ const Index = () => {
       applyFilters();
     } else {
       // Reset to default display when no filters are applied
-      setFilteredAnimals(animals);
+      setFilteredAnimals(animalsData);
     }
   }, [searchQuery, selectedSpecies, priceRange, selectedCategories]);
 
@@ -104,7 +104,7 @@ const Index = () => {
 
       {/* Greeting */}
       {userDetails ? (
-        <Text className="text-3xl font-tc-bold mt-auto">{`Hello ${userDetails?.zooname}`}</Text>
+        <Text className="text-3xl font-tc-bold mt-auto">{`Hello ${userDetails.zooname}`}</Text>
       ) : (
         <ActivityIndicator size="small" color="#CE4B26" />
       )}

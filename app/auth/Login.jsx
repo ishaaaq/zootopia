@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
@@ -13,11 +14,12 @@ import { Ionicons } from "@expo/vector-icons";
 import InputField from "@/components/InputField";
 import FormButton from "@/components/FormButton";
 import { router } from "expo-router";
-import { login } from "@/lib/AppWrite";
+import { login, getCurrentUser, logout } from "@/lib/AppWrite";
 import { useGlobalContext } from "@/lib/global-provider";
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { userDetails } = useGlobalContext();
+  const { userDetails, setUserDetails } = useGlobalContext();
+  const [loading, setLoading] = useState(false);
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Invalid email format")
@@ -29,14 +31,17 @@ const LoginForm = () => {
 
   const handleSubmit = async (values) => {
     try {
+      setLoading(true);
       const response = await login(values);
-      if (response) {
-        // const userDetails = await getCurrentUser();
-        // setUserDetails(userDetails); // Update the global context with user details
-        router.replace(`../../(${userDetails.usertype})`);
-      }
+      const userDetails = await getCurrentUser();
+      setUserDetails(userDetails); // Update the global context with user details
+      console.log("b4 replace", userDetails.usertype);
+      router.replace(`/(${userDetails.usertype})`);
     } catch (error) {
-      Alert.alert("Login Error", error.message);
+      Alert.alert("Login Error from this page", error.message);
+      await logout();
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,7 +88,11 @@ const LoginForm = () => {
             secureTextEntry={!showPassword}
             togglePassword={() => setShowPassword((prev) => !prev)}
           />
-          <FormButton title="Sign In" onPress={handleSubmit} />
+          <FormButton
+            title="Sign In"
+            loading={loading}
+            onPress={handleSubmit}
+          />
         </ScrollView>
       )}
     </Formik>

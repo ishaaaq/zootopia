@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   TextInput,
@@ -8,14 +8,14 @@ import {
 } from "react-native";
 import { sendMessage, databases, config } from "@/lib/AppWrite";
 import { useGlobalSearchParams } from "expo-router";
-import { triggerPusherEvent } from "../lib/pusher";
 import { Query } from "react-native-appwrite";
-import { usePusher } from "../lib/usePusher";
+
 const ChatScreen = () => {
   const { conversationId, recieiverId, senderId } = useGlobalSearchParams(); // Passed when navigating to this screen
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-
+  // const [ws, setWs] = useState(null);
+  const ws = useRef(null);
   useEffect(() => {
     // Fetch initial messages
     const fetchMessages = async () => {
@@ -32,34 +32,76 @@ const ChatScreen = () => {
     };
 
     fetchMessages();
-  }, [conversationId]);
 
-  usePusher(`conversation-${conversationId}`, "new-message", (data) => {
-    setMessages((prevMessages) => [...prevMessages, data]);
-  });
+    ws.current = new WebSocket("ws://localhost:8000");
+
+    ws.current.onopen = () => {
+      console.log("WebSocket connection opened");
+    };
+
+    ws.current.onclose = (event) => {
+      console.log("WebSocket connection closed", event);
+    };
+
+    ws.current.onerror = (error) => {
+      console.error("WebSocket error", error);
+    };
+
+    // const socket = new WebSocket("ws://localhost:8000");
+    // setWs(socket);
+
+    ws.current.onmessage = (event) => {
+      console.log("WebSocket message event:", event);
+      try {
+        const newMessage = JSON.parse(event.data);
+        console.log("Parsed message:", newMessage);
+        if (newMessage.conversationId === conversationId) {
+          setMessages((prev) => [...prev, newMessage]);
+        }
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error.message);
+      }
+    };
+
+    // return () => {
+    //   socket.close();
+    // };
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
+  }, [conversationId]);
 
   const handleSend = async () => {
     if (message.trim() === "") return;
 
     try {
       // Save the message to Appwrite
-      const newMessage = await sendMessage(conversationId, senderId, message);
+      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+        const newMessage = await sendMessage(conversationId, senderId, message);
 
-      // Trigger Pusher event for real-time updates
-      await triggerPusherEvent(
-        `conversation-${conversationId}`,
-        "new-message",
-        newMessage
-      );
-
-      setMessage("");
+        // Send the message to WebSocket server
+        // if (ws && ws.readyState === WebSocket.OPEN) {
+        //   ws.send(JSON.stringify(newMessage));
+        // } else {
+        //   console.error("WebSocket is not open. ReadyState:", ws?.readyState);
+        // }
+        ws.current.send(JSON.stringify(newMessage));
+        setMessage("");
+      } else {
+        console.error(
+          "WebSocket is not open. ReadyState:",
+          ws.current?.readyState
+        );
+      }
     } catch (error) {
       console.error("Error sending message:", error.message);
     }
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-gray px-2">
       <View></View>
       <FlatList
         data={messages}
@@ -67,8 +109,10 @@ const ChatScreen = () => {
         renderItem={({ item }) => (
           <Text
             className={`${
-              item.senderId === senderId ? "text-right" : "text-left"
-            } bg-primary-100 p-2 rounded my-1 w-auto`}
+              item.senderId === senderId
+                ? "self-end bg-primary-500 text-white"
+                : "self-start bg-primary-100"
+            }  p-2 rounded-full my-1 max-w-3/4`}
           >
             {item.message}
           </Text>

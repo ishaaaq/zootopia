@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
@@ -14,9 +15,11 @@ import InputField from "../../../components/InputField";
 import FormButton from "@/components/FormButton";
 import { signup } from "@/lib/AppWrite";
 import { useRouter } from "expo-router";
+import { useAppwrite } from "@/lib/UseAppwrite";
 
 const ZooSignupForm = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState({
     password: false,
     confirmPassword: false,
@@ -64,8 +67,17 @@ const ZooSignupForm = () => {
   ];
 
   const handleSubmit = async (values) => {
-    const response = await signup("zoo", values);
-    if (response) router.replace("(zoo)");
+    try {
+      setLoading(true);
+      const response = await signup("zoo", values);
+      if (response) {
+        router.replace("/auth/login");
+      }
+    } catch (error) {
+      Alert.alert("Sign up error: ", error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -184,7 +196,11 @@ const ZooSignupForm = () => {
             }
           />
 
-          <FormButton title="Sign up" onPress={handleSubmit} />
+          <FormButton
+            title="Sign up"
+            loading={loading}
+            onPress={handleSubmit}
+          />
         </ScrollView>
       )}
     </Formik>

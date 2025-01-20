@@ -21,7 +21,7 @@ const Profile = () => {
         <View className="flex-col">
           <Text className="text-2xl font-tc-bold text-black">Profile</Text>
           <Text className="text-xl font-tc text-gray-600">
-            {userDetails?.zooname}
+            {userDetails?.name}
           </Text>
         </View>
         <Image

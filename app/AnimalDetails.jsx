@@ -35,7 +35,7 @@ const AnimalDetails = () => {
     // Check if a conversation already exists with the user
     const conversations = await getConversations();
     let conversation = conversations.find((conv) =>
-      conv.participants.includes(seller.$id)
+      conv.participants.includes(seller.$id && userDetails.$id)
     );
 
     if (!conversation) {

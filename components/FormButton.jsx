@@ -1,12 +1,16 @@
 import React from "react";
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity, Text, ActivityIndicator } from "react-native";
 
-const FormButton = ({ title, onPress, style = "" }) => (
+const FormButton = ({ title, loading, onPress, style = "" }) => (
   <TouchableOpacity
     onPress={onPress}
-    className={`bg-blue-500 p-3 rounded-full h-15 flex justify-center ${style}`} // default style and custom styles
+    className={`bg-primary-500 p-3 rounded-full h-15 flex justify-center ${style}`} // default style and custom styles
   >
-    <Text className="text-white text-center text-lg">{title}</Text>
+    {loading ? (
+      <ActivityIndicator color={"white"} size={"small"} />
+    ) : (
+      <Text className="text-white text-center text-lg">{title}</Text>
+    )}
   </TouchableOpacity>
 );
 

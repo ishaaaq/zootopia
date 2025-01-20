@@ -13,10 +13,12 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSupplierAnimals } from "@/lib/SupplierAnimalsProvider";
 import { useGlobalContext } from "@/lib/global-provider";
+import { fetchAnimalsForCurrentUser } from "@/lib/AppWrite";
 const SupplierHome = () => {
   const router = useRouter();
   const { userDetails } = useGlobalContext();
   const [animals, setAnimals] = useState([]);
+  // const [loading, setLoading] = useState(false);
   const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
 
   useEffect(() => {
@@ -24,6 +26,15 @@ const SupplierHome = () => {
       setAnimals(supplierAnimals);
     }
   }, [supplierAnimals]);
+
+  // useEffect(async () => {
+  //   setLoading(true);
+  //   const response = await fetchAnimalsForCurrentUser();
+  //   if (response) {
+  //     setAnimals(response);
+  //   }
+  //   setLoading(false);
+  // });
 
   if (loading) {
     return (
@@ -33,9 +44,9 @@ const SupplierHome = () => {
     );
   }
 
-  if (error) {
-    return <Text>Error: {error.message}</Text>;
-  }
+  // if (error) {
+  //   return <Text>Error: {error.message}</Text>;
+  // }
 
   const renderAnimalCard = ({ item }) => (
     <TouchableOpacity
