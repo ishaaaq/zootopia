@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useGlobalContext } from "@/lib/global-provider";
 import { logout } from "@/lib/AppWrite";
@@ -35,8 +35,15 @@ const Profile = () => {
           className="flex-row items-center space-x-4"
           onPress={() => router.push("../EditProfile")}
         >
-          <MaterialIcons name="edit" size={24} color="#4CAF50" />
+          <MaterialIcons name="edit" size={24} color="gray" />
           <Text className="text-base">Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="flex-row items-center space-x-4"
+          onPress={() => router.push("../AccountDetails")}
+        >
+          <Ionicons name="wallet" size={24} color="gray" />
+          <Text className="text-base">Bank Account</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

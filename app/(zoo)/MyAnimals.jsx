@@ -11,21 +11,20 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useSupplierAnimals } from "@/lib/SupplierAnimalsProvider";
+import { useZooAnimals } from "@/lib/ZooAnimalsProvider";
 import { useGlobalContext } from "@/lib/global-provider";
-import { fetchAnimalsForCurrentUser } from "@/lib/AppWrite";
-const SupplierHome = () => {
+const MyAnimals = () => {
   const router = useRouter();
   const { userDetails } = useGlobalContext();
   const [animals, setAnimals] = useState([]);
   // const [loading, setLoading] = useState(false);
-  const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
+  const { zooAnimals, loading, error, refetch } = useZooAnimals();
 
   useEffect(() => {
-    if (supplierAnimals) {
-      setAnimals(supplierAnimals);
+    if (zooAnimals) {
+      setAnimals(zooAnimals);
     }
-  }, [supplierAnimals]);
+  }, [zooAnimals]);
 
   // useEffect(async () => {
   //   setLoading(true);
@@ -62,7 +61,6 @@ const SupplierHome = () => {
         <Text className="text-sm text-gray-600">
           {item.category} - {item.quantity}
         </Text>
-        <Text className="text-lg font-bold text-primary-800">{`N${item.price}`}</Text>
       </View>
       <TouchableOpacity
         onPress={() => router.push(`/EditAnimal?animalId=${item.$id}`)}
@@ -75,9 +73,6 @@ const SupplierHome = () => {
   return (
     <SafeAreaView className="flex-1 bg-white px-6 py-4">
       <StatusBar backgroundColor="#CE4B26" />
-      <Text className="text-2xl text-gray-900 mb-6">{`Hello ${
-        userDetails ? userDetails.name : "Seller"
-      }`}</Text>
       <Text className="text-3xl font-bold text-gray-900 mb-6">My Animals</Text>
 
       {animals.length === 0 ? (
@@ -89,11 +84,11 @@ const SupplierHome = () => {
           />
           <Text className="text-lg text-gray-600 text-center mb-6">
             No animals found. Click the "Add Animal" button to add your first
-            animal to the marketplace.
+            animal.
           </Text>
           <TouchableOpacity
             className="flex-row items-center justify-center bg-primary-300 rounded-lg px-6 py-3"
-            onPress={() => router.push("../AddAnimal")}
+            onPress={() => router.push("../AddZooAnimal")}
           >
             <Ionicons name="add-circle" size={24} color="#fff" />
             <Text className="text-white text-lg font-semibold ml-2">
@@ -124,4 +119,4 @@ const SupplierHome = () => {
   );
 };
 
-export default SupplierHome;
+export default MyAnimals;

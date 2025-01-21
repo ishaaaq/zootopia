@@ -65,6 +65,16 @@ const ZooLayout = () => {
         }}
       />
       <Tabs.Screen
+        name="MyAnimals"
+        options={{
+          title: "MyAnimals",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon icon={icons.dog} focused={focused} title={"MyAnimals"} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="Exchanges"
         options={{
           title: "Exchanges",

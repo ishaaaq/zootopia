@@ -41,7 +41,7 @@ export const DropdownField = ({
         className="h-13"
       >
         <Picker.Item label={`Select ${label.toLowerCase()}`} value="" />
-        {options.map((option, index) => (
+        {options?.map((option, index) => (
           <Picker.Item key={index} label={option.label} value={option.value} />
         ))}
       </Picker>
@@ -49,3 +49,21 @@ export const DropdownField = ({
     {touched && error && <Text className="text-red-500 mt-2">{error}</Text>}
   </View>
 );
+
+export const BankDropdown = ({ label, options, selectedValue, onSelect }) => {
+  return (
+    <View>
+      <Text>{label}</Text>
+      <View className="bg-white rounded-lg border border-gray-300 h-13 flex justify-center">
+        <Picker
+          selectedValue={selectedValue}
+          onValueChange={(itemValue) => onSelect(itemValue)}
+        >
+          {options.map((bank) => (
+            <Picker.Item key={bank.id} label={bank.name} value={bank} />
+          ))}
+        </Picker>
+      </View>
+    </View>
+  );
+};

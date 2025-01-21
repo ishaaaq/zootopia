@@ -5,11 +5,13 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { sendMessage, databases, config } from "@/lib/AppWrite";
 import { useGlobalSearchParams } from "expo-router";
 import { Query } from "react-native-appwrite";
-
+import icons from "@/constants/icons";
+import { Ionicons } from "@expo/vector-icons";
 const ChatScreen = () => {
   const { conversationId, recieiverId, senderId } = useGlobalSearchParams(); // Passed when navigating to this screen
   const [messages, setMessages] = useState([]);
@@ -129,7 +131,8 @@ const ChatScreen = () => {
           onPress={handleSend}
           className="ml-2 bg-primary-500 p-2 rounded"
         >
-          <Text className="text-white">Send</Text>
+          {/* <Text className="text-white">Send</Text> */}
+          <Ionicons name="send" color={"white"} size={20} />
         </TouchableOpacity>
       </View>
     </View>

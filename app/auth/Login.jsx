@@ -33,10 +33,12 @@ const LoginForm = () => {
     try {
       setLoading(true);
       const response = await login(values);
-      const userDetails = await getCurrentUser();
-      setUserDetails(userDetails); // Update the global context with user details
-      console.log("b4 replace", userDetails.usertype);
-      router.replace(`/(${userDetails.usertype})`);
+      if (response) {
+        const userDetails = await getCurrentUser();
+        setUserDetails(userDetails); // Update the global context with user details
+        console.log("b4 replace", userDetails.usertype);
+        router.replace(`/(${userDetails.usertype})`);
+      }
     } catch (error) {
       Alert.alert("Login Error from this page", error.message);
       await logout();

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import {useFonts}from "expo-font"
 import { Stack, useRouter } from 'expo-router';
 import { SupplierAnimalsProvider } from '@/lib/SupplierAnimalsProvider';
+import { ZooAnimalsProvider } from '@/lib/ZooAnimalsProvider';
 import { AnimalsProvider } from '@/lib/AnimalsProvider';
 import { GlobalProvider,  useGlobalContext} from '@/lib/global-provider'
 import { ActivityIndicator, View } from 'react-native';
@@ -37,12 +38,14 @@ const RootLayout = () => {
         <>
         <AnimalsProvider>
             <SupplierAnimalsProvider>
+            {/* <ZooAnimalsProvider> */}
             <Stack initialRouteName="GetStarted">
                  <Stack.Screen name="GetStarted" options={{ headerShown: false }} />
                 <Stack.Screen name="(zoo)" options={{ headerShown: false }} />
                 <Stack.Screen name="(buyer)" options={{ headerShown: false }} />
                 <Stack.Screen name="(supplier)" options={{ headerShown: false }} />
                 <Stack.Screen name="AddAnimal" options={{ headerShown: false }} />
+                <Stack.Screen name="AddZooAnimal" />
                 <Stack.Screen name="EditAnimal" options={{ headerShown: false }} />
                 <Stack.Screen name="EditProfile" options={{ headerShown: false }} />
                 <Stack.Screen name="AnimalDetails" options={{ headerShown: false }} />
@@ -53,6 +56,7 @@ const RootLayout = () => {
                 <Stack.Screen name="auth/signup/Supplier"  options={{ headerShown: false }}/>
                 <Stack.Screen name="auth/Login"  options={{ headerShown: false }}/>
             </Stack>
+            {/* </ZooAnimalsProvider> */}
             </SupplierAnimalsProvider>
            </AnimalsProvider>
         </>

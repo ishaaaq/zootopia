@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, Picker, TextInput, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import { useAnimals } from "@/lib/AnimalsProvider";
 
-const ProposeExchangePage = ({ route }) => {
-  const { zooId, animalId } = route.params; // Passed zoo and animal ID
+const ProposeExchangePage = () => {
+  const { zooId, animalId } = useGlobalSearchParams(); // Passed zoo and animal ID
   const { animals } = useAnimals();
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [notes, setNotes] = useState("");
@@ -45,7 +45,7 @@ const ProposeExchangePage = ({ route }) => {
       {/* Submit */}
       <TouchableOpacity
         onPress={handleSubmit}
-        className="bg-green-500 p-4 rounded-full mt-4"
+        className="bg-primary-500 p-4 rounded mt-4"
       >
         <Text className="text-white text-center">Submit Proposal</Text>
       </TouchableOpacity>
