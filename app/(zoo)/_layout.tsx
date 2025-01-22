@@ -54,7 +54,21 @@ const ZooLayout = () => {
           ),
         }}
       />
-      <Tabs.Screen
+        <Tabs.Screen
+            name="Messages"
+            options={{
+              title: "Messages",
+              headerShown: false,
+              tabBarIcon: ({ focused }) => (
+                <TabIcon
+                icon={icons.chat}
+                  focused={focused}
+                  title="Messages"
+                />
+              ),
+            }}
+          />
+      {/* <Tabs.Screen
         name="Explore"
         options={{
           title: "Explore",
@@ -77,7 +91,7 @@ const ZooLayout = () => {
             />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="Profile"
         options={{

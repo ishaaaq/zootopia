@@ -6,7 +6,7 @@ import { Stack, useRouter } from 'expo-router';
 import { SupplierAnimalsProvider } from '@/lib/SupplierAnimalsProvider';
 import { AnimalsProvider } from '@/lib/AnimalsProvider';
 import { GlobalProvider,  useGlobalContext} from '@/lib/global-provider'
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, StatusBar, View } from 'react-native';
 const RootLayout = () => {
  const { userDetails, loading, initialRoute } = useGlobalContext();
     const [fontsLoaded] = useFonts({
@@ -35,6 +35,12 @@ const RootLayout = () => {
     if(!fontsLoaded) return null
     return (
         <>
+         <StatusBar
+        hidden={false}
+        backgroundColor="#CE4B26"
+        barStyle="light-content"
+        translucent={false}
+      />
         <AnimalsProvider>
             <SupplierAnimalsProvider>
             <Stack initialRouteName="GetStarted">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import {
   View,
   TextInput,
@@ -9,12 +9,20 @@ import {
 import { sendMessage, databases, config } from "@/lib/AppWrite";
 import { useGlobalSearchParams } from "expo-router";
 import { Query } from "react-native-appwrite";
-
+import { useNavigation } from "@react-navigation/native";
 const ChatScreen = () => {
-  const { conversationId, recieiverId, senderId } = useGlobalSearchParams(); // Passed when navigating to this screen
+  const { conversationId, participantName, senderId } = useGlobalSearchParams(); // Passed when navigating to this screen
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   // const [ws, setWs] = useState(null);
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: participantName || "Chat",
+    });
+  }, [navigation, participantName]);
+
   const ws = useRef(null);
   useEffect(() => {
     // Fetch initial messages

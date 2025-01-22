@@ -15,15 +15,19 @@ import {
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSupplierAnimals } from "@/lib/SupplierAnimalsProvider";
 import { deleteAnimal } from "@/lib/AppWrite";
-const AnimalDetails = () => {
+const MyAnimalDetails = () => {
   const { animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
   const { supplierAnimals, loading, error } = useSupplierAnimals();
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    const animal = supplierAnimals.find((animal) => animal.$id === animalId);
-    setAnimal(animal);
+    if (supplierAnimals) {
+      const animal = supplierAnimals.find((animal) => animal.$id === animalId);
+      setAnimal(animal);
+    }
+    console.log(supplierAnimals);
+    console.log(animalId);
   }, [animalId]);
 
   const handleDelete = async () => {
@@ -59,7 +63,6 @@ const AnimalDetails = () => {
         className="flex-1"
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <StatusBar backgroundColor="#CE4B26" barStyle="light-content" />
           {/* Animal Image */}
           <View style={{ height: "50%", width: "100%" }} className="relative">
             <Image
@@ -174,4 +177,4 @@ const AnimalDetails = () => {
   );
 };
 
-export default AnimalDetails;
+export default MyAnimalDetails;

@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import SearchBar from "@/components/SearchBar";
-import SpeciesFilter from "@/components/SpeciesFilter";
+import CategoriesFilter from "@/components/CategoriesFilter";
 import Card from "@/components/Card";
 import FilterModal from "@/components/FilterModal";
 import icons from "@/constants/icons";
@@ -20,9 +20,9 @@ import { useAnimals } from "@/lib/AnimalsProvider";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSpecies, setSelectedSpecies] = useState("All");
+  const [selectedCategories, setSelectedCategories] = useState("All");
   const [priceRange, setPriceRange] = useState([0, 10000]); // Default range
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  // const [selectedCategories, setSelectedCategories] = useState([]);
   const [filteredAnimals, setFilteredAnimals] = useState([]);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [animals, setAnimals] = useState();
@@ -35,29 +35,22 @@ const Index = () => {
   // Filter Logic
   const applyFilters = () => {
     const filtered = animals.filter((animal) => {
-      const matchesSpecies =
-        selectedSpecies === "All" ||
+      const matchesCategories =
+        selectedCategories === "All" ||
         `${animal.category + "s"}`.toLowerCase() ===
-          selectedSpecies.toLowerCase();
+          selectedCategories.toLowerCase();
       const matchesSearchQuery = animal.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-      const matchesPrice =
-        animal.price >= priceRange[0] && animal.price <= priceRange[1];
-      const matchesCategory =
-        selectedCategories.length === 0 ||
-        selectedCategories.includes(animal.category);
-
-      // console.log({
-      //   animal,
-      //   matchesSpecies,
-      //   matchesSearchQuery,
-      //   matchesPrice,
-      //   matchesCategory,
-      // });
+      // const matchesPrice =
+      //   animal.price >= priceRange[0] && animal.price <= priceRange[1];
+      // const matchesCategory =
+      //   selectedCategories.length === 0 ||
+      //   selectedCategories.includes(animal.category);
 
       return (
-        matchesSpecies && matchesSearchQuery && matchesPrice && matchesCategory
+        matchesCategories && matchesSearchQuery
+        //  &&matchesPrice /*&& matchesCategory*/
       );
     });
 
@@ -65,34 +58,48 @@ const Index = () => {
   };
 
   useEffect(() => {
-    setAnimals(animalsData);
-    setFilteredAnimals(animalsData);
+    if (animalsData) {
+      setAnimals(animalsData);
+      setFilteredAnimals(animalsData);
+    }
   }, [animalsData]);
 
   // Reapply filters when filters are changed
   useEffect(() => {
     if (
       searchQuery ||
-      selectedSpecies !== "All" ||
-      selectedCategories.length > 0
+      selectedCategories !== "All"
+      // || selectedCategories.length > 0
     ) {
       applyFilters();
     } else {
       // Reset to default display when no filters are applied
       setFilteredAnimals(animalsData);
     }
-  }, [searchQuery, selectedSpecies, priceRange, selectedCategories]);
+  }, [searchQuery, selectedCategories /* priceRange  selectedCategories*/]);
 
-  console.log("animalsData:", animalsData);
-  console.log("userdetails:", userDetails);
-  console.log("animals", animals);
-  console.log("filered animals", filteredAnimals);
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#CE4B26" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return <Text>Error: {error.message}</Text>;
+  }
 
   return (
-    <ScrollView className="flex-1 bg-white p-4">
+    <ScrollView className="flex-1 bg-white p-4 pb-30">
       {/* Header */}
-      <View className="flex flex-row justify-between mb-4 px-4">
-        <Text className="text-2xl font-tc-bold mt-auto">Zootopia</Text>
+      <View className="flex flex-row justify-between mb-4">
+        <View className="flex-row items-center">
+          <Ionicons name="location" color={"gray"} size={20} />
+          <Text className="text-xl font-tc-bold text-gray-500">
+            {`${userDetails.location}, Nigeria`}
+          </Text>
+        </View>
         <View className="bg-white flex items-center justify-center shadow-md shadow-black-100 rounded-xl w-12 h-12">
           <Image
             source={icons.bell}
@@ -110,7 +117,7 @@ const Index = () => {
       )}
 
       {/* Search Bar */}
-      <View className="flex flex-row justify-between mt-4 px-4">
+      <View className="flex flex-row justify-between mt-4">
         <SearchBar
           value={searchQuery}
           onChangeText={(text) => setSearchQuery(text)}
@@ -123,21 +130,23 @@ const Index = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Species Filter */}
-      <Text className="mt-4 mb-2 font-tc-bold text-2xl ml-3">Categories</Text>
-      <SpeciesFilter
-        species={[
-          "All",
-          "Mammals",
-          "Birds",
-          "Reptiles",
-          "Amphibians",
-          "Fish",
-          "Others",
+      {/* Categories Filter */}
+      <Text className="mt-4 mb-2 font-tc-bold text-2xl">Categories</Text>
+      <CategoriesFilter
+        Categories={[
+          { name: "All", emoji: "🌍" },
+          { name: "Mammals", emoji: "🦁" },
+          { name: "Birds", emoji: "🐦" },
+          { name: "Reptiles", emoji: "🐍" },
+          { name: "Amphibians", emoji: "🐸" },
+          { name: "Fish", emoji: "🐟" },
+          { name: "Others", emoji: "🌀" },
         ]}
-        selectedSpecies={selectedSpecies}
-        onSelectSpecies={(specie) =>
-          setSelectedSpecies(selectedSpecies === specie ? "All" : specie)
+        selectedCategories={selectedCategories}
+        onSelectCategories={(Category) =>
+          setSelectedCategories(
+            selectedCategories === Category ? "All" : Category
+          )
         }
       />
 

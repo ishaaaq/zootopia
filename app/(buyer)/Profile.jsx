@@ -1,6 +1,6 @@
 import React from "react";
-import ProfilePage from "../../components/ProfilePage";
-
+import { StyleSheet, View } from "react-native";
+import ProfilePage from "@/components/ProfilePage";
 const Profile = () => {
   return (
     <>

@@ -5,18 +5,18 @@ const AnimalCard = ({ image, name, category, price, quantity, onPress }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      className="m-2 pb-2 bg-white rounded-lg shadow w-43 overflow-hidden"
+      className="m-2 pb-2 bg-gray-100 rounded-lg shadow w-43 overflow-hidden"
     >
       {/* Animal Image */}
       <Image
-        source={image}
+        source={{ uri: image }}
         className=" rounded-t-lg"
         resizeMode="cover"
         style={{ width: "100%", height: 170 }}
       />
 
       {/* Animal Details */}
-      <View className="px-2 flex flex-row justify-between">
+      <View className="px-2 flex flex-row justify-between bg-gray-100">
         <View>
           <Text className="text-lg font-bold text-gray-800">
             {name.length > 10 ? name.slice(0, 10) : name}

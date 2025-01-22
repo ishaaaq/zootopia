@@ -18,29 +18,29 @@ const SupplierHome = () => {
   const router = useRouter();
   const { userDetails } = useGlobalContext();
   const [animals, setAnimals] = useState([]);
-  const [loading, setLoading] = useState(false);
-  // const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
-
-  // useEffect(() => {
-  //   if (supplierAnimals) {
-  //     setAnimals(supplierAnimals);
-  //   }
-  // }, [supplierAnimals]);
+  // const [loading, setLoading] = useState(false);
+  const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
 
   useEffect(() => {
-    const fetchAnimals = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchAnimalsForCurrentUser();
-        setAnimals(response);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAnimals();
-  }, []);
+    if (supplierAnimals) {
+      setAnimals(supplierAnimals);
+    }
+  }, [supplierAnimals]);
+
+  // useEffect(() => {
+  //   const fetchAnimals = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const response = await fetchAnimalsForCurrentUser();
+  //       setAnimals(response);
+  //     } catch (error) {
+  //       console.error(error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchAnimals();
+  // }, []);
 
   if (loading) {
     return (
@@ -50,9 +50,9 @@ const SupplierHome = () => {
     );
   }
 
-  // if (error) {
-  //   return <Text>Error: {error.message}</Text>;
-  // }
+  if (error) {
+    return <Text>Error: {error.message}</Text>;
+  }
 
   const renderAnimalCard = ({ item }) => (
     <TouchableOpacity
@@ -86,10 +86,10 @@ const SupplierHome = () => {
       }`}</Text>
       <Text className="text-3xl font-bold text-gray-900 mb-6">My Animals</Text>
 
-      {animals.length === 0 ? (
+      {supplierAnimals.length === 0 ? (
         <View className="flex-1 justify-center items-center px-6">
           <Image
-            source={require("@/assets/images/sadPup.jpg")} // Add a suitable placeholder image
+            source={require("@/assets/images/sadPup.jpg")}
             className="mb-6"
             style={{ width: 165, height: 165 }}
           />

@@ -33,13 +33,12 @@ const AnimalDetails = () => {
     console.log("A", sellerId);
     console.log("B", seller);
     // Check if a conversation already exists with the user
-    const conversations = await getConversations();
+    const conversations = await getConversations(userDetails.$id);
     let conversation = conversations.find((conv) =>
       conv.participants.includes(seller.$id && userDetails.$id)
     );
 
     if (!conversation) {
-      // Create a new conversation
       conversation = await databases.createDocument(
         config.database,
         config.conversation,
@@ -50,14 +49,8 @@ const AnimalDetails = () => {
         }
       );
     }
-
-    // navigation.navigate("ChatScreen", {
-    //   conversationId: conversation.$id,
-    //   senderId: "currentUserId",
-    // });
-
     return router.push(
-      `/ChatScreen?conversationId=${conversation.$id}&receiverId=${seller.$id}&senderId=${userDetails.$id}`
+      `/ChatScreen?conversationId=${conversation.$id}&participantName=${seller.name}&senderId=${userDetails.$id}`
     );
   };
 
@@ -67,16 +60,12 @@ const AnimalDetails = () => {
   const totalPrice = animal.price * quantity;
   return (
     <>
-      <SafeAreaView
-        style={{ height: "full", width: "100%" }}
-        className="flex-1"
-      >
-        <ScrollView>
-          <StatusBar backgroundColor="#CE4B26" barStyle="light-content" />
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {/* Animal Image */}
-          <View style={{ height: "50%", width: "100%" }} className="relative">
+          <View style={{ height: 300, width: "100%" }} className="relative">
             <Image
-              source={animal.image}
+              source={{ uri: animal.image }}
               style={{ resizeMode: "cover", height: "100%", width: "100%" }}
             />
             <TouchableOpacity
@@ -89,10 +78,7 @@ const AnimalDetails = () => {
           </View>
 
           {/* Animal Details */}
-          <View
-            style={{ height: "100%" }}
-            className="mt-[-40px] w-full rounded-t-3xl bg-gray-100 p-4"
-          >
+          <View className="mt-[-40px] w-full rounded-t-3xl bg-gray-100 p-4">
             <Text className="text-2xl font-bold text-gray-800">
               {animal.shortDescription}
             </Text>
@@ -107,7 +93,8 @@ const AnimalDetails = () => {
               ].map((item, index) => (
                 <View
                   key={index}
-                  style={{ width: 110, height: 120 }}
+                  style={{ width: 100, height: 110 }}
+                  // style={{ width: 110, height: 120 }}
                   className=" bg-white rounded-lg shadow-md flex flex-col justify-center px-2"
                 >
                   <Text className="text-primary font-tc-bold text-center text-2xl">
@@ -170,7 +157,7 @@ const AnimalDetails = () => {
               </View>
             </View>
             {/* Buy Now Button */}
-            <TouchableOpacity className="bg-primary rounded-md py-3 mt-3 flex-row items-center justify-center">
+            <TouchableOpacity className="bg-primary rounded-md py-3  flex-row items-center justify-center">
               <Ionicons name="cart" size={25} color="white" />
               <Text
                 className="text-white text-center text-lg "

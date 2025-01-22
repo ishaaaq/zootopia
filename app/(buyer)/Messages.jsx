@@ -1,15 +1,13 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import MessagesPage from "../../components/MessagesPage";
 
 const Messages = () => {
   return (
-    <>
+    <View>
       <MessagesPage />
-    </>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default Messages;
