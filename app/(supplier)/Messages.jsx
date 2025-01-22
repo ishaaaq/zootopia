@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { getConversations } from "@/lib/AppWrite";
+import { getConversations, getUserDetails } from "@/lib/AppWrite";
 import { useGlobalContext } from "@/lib/global-provider";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 const Messages = () => {
   const [conversations, setConversations] = useState([]);
@@ -19,7 +20,20 @@ const Messages = () => {
     const fetchConversations = async () => {
       try {
         const fetchedConversations = await getConversations();
-        setConversations(fetchedConversations);
+        const resolvedConversations = await Promise.all(
+          fetchedConversations.map(async (conversation) => {
+            const otherParticipantId = conversation.participants.find(
+              (id) => id !== userDetails.$id // Exclude current user ID
+            );
+
+            const participantDetails = await getUserDetails(otherParticipantId);
+            return {
+              ...conversation,
+              participantName: participantDetails.zooname || "Unknown User",
+            };
+          })
+        );
+        setConversations(resolvedConversations);
       } catch (error) {
         console.error("Error fetching conversations:", error.message);
       } finally {
@@ -64,12 +78,17 @@ const Messages = () => {
             onPress={() => openConversation(item.$id, userDetails.$id)}
             className="flex-row justify-between p-4 bg-gray-100 mb-2 rounded"
           >
-            <Text className="font-medium">
-              {/* Display the participant's name */}
-              {item.participants[1]}
-            </Text>
+            <View className="flex-row">
+              <Ionicons name="person" color="gray" size={35} />
+              <Text className="font-medium text-xl my-auto ml-4">
+                {/* Display the participant's name */}
+                {item.participantName}
+              </Text>
+            </View>
             <Text className="text-sm text-gray-500">{item.lastMessage}</Text>
-            <Text className="text-xs text-gray-400">{item.timestamp}</Text>
+            <Text className="text-xs text-gray-400">
+              {new Date(item.timestamp).toISOString()}
+            </Text>
           </TouchableOpacity>
         )}
       />

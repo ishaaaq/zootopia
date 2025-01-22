@@ -18,23 +18,29 @@ const SupplierHome = () => {
   const router = useRouter();
   const { userDetails } = useGlobalContext();
   const [animals, setAnimals] = useState([]);
-  // const [loading, setLoading] = useState(false);
-  const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
+  const [loading, setLoading] = useState(false);
+  // const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
+
+  // useEffect(() => {
+  //   if (supplierAnimals) {
+  //     setAnimals(supplierAnimals);
+  //   }
+  // }, [supplierAnimals]);
 
   useEffect(() => {
-    if (supplierAnimals) {
-      setAnimals(supplierAnimals);
-    }
-  }, [supplierAnimals]);
-
-  // useEffect(async () => {
-  //   setLoading(true);
-  //   const response = await fetchAnimalsForCurrentUser();
-  //   if (response) {
-  //     setAnimals(response);
-  //   }
-  //   setLoading(false);
-  // });
+    const fetchAnimals = async () => {
+      try {
+        setLoading(true);
+        const response = await fetchAnimalsForCurrentUser();
+        setAnimals(response);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAnimals();
+  }, []);
 
   if (loading) {
     return (
@@ -50,12 +56,12 @@ const SupplierHome = () => {
 
   const renderAnimalCard = ({ item }) => (
     <TouchableOpacity
-      onPress={() => router.push(`/MyAnimalDetail?animalId=${item.$id}`)}
-      className="flex-row bg-gray-100 rounded-lg p-4 mb-4 items-center"
+      onPress={() => router.push(`/MyAnimalDetails?animalId=${item.$id}`)}
+      className="flex-row bg-gray-100 rounded-lg p-2 mb-4 items-center"
     >
       <Image
         source={{ uri: item.image }}
-        className="w-12 h-12 rounded-lg mr-4"
+        className="w-15 h-15 rounded-lg mr-4"
       />
       <View className="flex-1">
         <Text className="text-lg font-bold text-gray-800">{item.name}</Text>

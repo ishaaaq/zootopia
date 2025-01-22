@@ -58,7 +58,7 @@ const AnimalDetails = () => {
         style={{ height: "full", width: "100%" }}
         className="flex-1"
       >
-        <ScrollView>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <StatusBar backgroundColor="#CE4B26" barStyle="light-content" />
           {/* Animal Image */}
           <View style={{ height: "50%", width: "100%" }} className="relative">
@@ -111,31 +111,34 @@ const AnimalDetails = () => {
             <Text className="text-sm text-gray-800">
               {animal.longDescription}
             </Text>
-            {/* Buy Now Button */}
-            <TouchableOpacity
-              onPress={() => router.push(`/EditAnimal?animalId=${animal.$id}`)}
-              className="bg-primary rounded-md py-3 mt-3 flex-row items-center justify-center"
-            >
-              <Ionicons name="create-outline" size={25} color="white" />
-              <Text
-                className="text-white text-center text-lg "
-                style={{ marginLeft: 10 }}
+            <View style={{ marginTop: "10%" }}>
+              <TouchableOpacity
+                onPress={() =>
+                  router.push(`/EditAnimal?animalId=${animal.$id}`)
+                }
+                className="bg-primary rounded-md py-3 mt-3 flex-row items-center justify-center"
               >
-                Edit
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setModalVisible(true)}
-              className="bg-red-500 rounded-md py-3 mt-3 flex-row items-center justify-center"
-            >
-              <Ionicons name="trash" size={25} color="white" />
-              <Text
-                className="text-white text-center text-lg "
-                style={{ marginLeft: 10 }}
+                <Ionicons name="create-outline" size={25} color="white" />
+                <Text
+                  className="text-white text-center text-lg "
+                  style={{ marginLeft: 10 }}
+                >
+                  Edit
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setModalVisible(true)}
+                className="bg-red-500 rounded-md py-3 mt-3 flex-row items-center justify-center"
               >
-                Delete
-              </Text>
-            </TouchableOpacity>
+                <Ionicons name="trash" size={25} color="white" />
+                <Text
+                  className="text-white text-center text-lg "
+                  style={{ marginLeft: 10 }}
+                >
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
         <Modal
