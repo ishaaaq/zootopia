@@ -14,6 +14,7 @@
     "nativewind-env.d.ts",
     "app/auth/signup/Zoo.jsx",
     "app/(zoo)/index.jsx",
-    "app/SelectUserType.jsx"
+    "app/SelectUserType.jsx",
+    "app/_layout.jsx"
   ]
 }

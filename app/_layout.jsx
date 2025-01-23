@@ -5,6 +5,7 @@ import {useFonts}from "expo-font"
 import { Stack, useRouter } from 'expo-router';
 import { SupplierAnimalsProvider } from '@/lib/SupplierAnimalsProvider';
 import { AnimalsProvider } from '@/lib/AnimalsProvider';
+import { NotificationsProvider } from '@/lib/NotificationsContext';
 import { GlobalProvider,  useGlobalContext} from '@/lib/global-provider'
 import { ActivityIndicator, StatusBar, View } from 'react-native';
 const RootLayout = () => {
@@ -43,6 +44,7 @@ const RootLayout = () => {
       />
         <AnimalsProvider>
             <SupplierAnimalsProvider>
+              <NotificationsProvider userId={userDetails.$id}>
             <Stack initialRouteName="GetStarted">
                  <Stack.Screen name="GetStarted" options={{ headerShown: false }} />
                 <Stack.Screen name="(zoo)" options={{ headerShown: false }} />
@@ -59,6 +61,7 @@ const RootLayout = () => {
                 <Stack.Screen name="auth/signup/Supplier"  options={{ headerShown: false }}/>
                 <Stack.Screen name="auth/Login"  options={{ headerShown: false }}/>
             </Stack>
+            </NotificationsProvider>
             </SupplierAnimalsProvider>
            </AnimalsProvider>
         </>

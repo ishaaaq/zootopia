@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import { getNotifications } from "@/lib/AppWrite";
 import { useGlobalContext } from "@/lib/global-provider";
 import icons from "@/constants/icons";
 import { router } from "expo-router";
+import { useNotifications } from "@/lib/NotificationsContext";
 const BellWithBadge = () => {
-  const [notifications, setNotifications] = useState([]);
-  const { userDetails } = useGlobalContext();
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      const data = await getNotifications(userDetails.$id);
-      setNotifications(data);
-    };
-    fetchNotifications();
-  }, []);
-  const unreadCount = notifications.filter((n) => n.isRead == false).length;
-  console.log("is read", unreadCount);
+  const { notifications } = useNotifications();
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
   return (
     <TouchableOpacity
       onPress={() => router.push("/Notifications")}

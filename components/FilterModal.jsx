@@ -65,7 +65,7 @@ const FilterModal = ({ isVisible, onClose, onApplyFilters }) => {
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View className="flex-1 justify-end bg-black bg-opacity-50">
+      <View className="flex-1 justify-end ">
         {/* Filter Content */}
         <View
           className="w-full bg-white rounded-t-xl p-4"

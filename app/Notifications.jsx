@@ -6,37 +6,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { getNotifications, markNotificationAsRead } from "@/lib/AppWrite";
-import { useGlobalContext } from "@/lib/global-provider";
-import { client, config, databases } from "@/lib/AppWrite";
+import { client, config } from "@/lib/AppWrite";
+import { useNotifications } from "@/lib/NotificationsContext";
 const Notifications = () => {
-  const [notifications, setNotifications] = useState([]);
-  const { userDetails } = useGlobalContext();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [refetchTrigger, setRefetchTrigger] = useState(false);
-
+  const { notifications, markAllAsRead, loading, error } = useNotifications();
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const data = await getNotifications(userDetails.$id);
-        setNotifications(data);
-        // Mark all notifications as read
-        await Promise.all(
-          data.map(async (element) => {
-            await markNotificationAsRead(element.$id);
-          })
-        );
-
-        // Trigger refetch
-        setRefetchTrigger((prev) => !prev);
-      } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchNotifications();
+    markAllAsRead();
   }, []);
 
   useEffect(() => {
@@ -51,21 +26,6 @@ const Notifications = () => {
 
     return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    const refetchNotifications = async () => {
-      try {
-        const data = await getNotifications(userDetails.$id);
-        setNotifications(data);
-      } catch (error) {
-        setError(error);
-      }
-    };
-
-    if (refetchTrigger) {
-      refetchNotifications();
-    }
-  }, [refetchTrigger, userDetails.$id]);
 
   if (loading) {
     return (
