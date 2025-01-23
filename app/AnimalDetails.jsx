@@ -10,28 +10,35 @@ import {
   StatusBar,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAnimals } from "@/lib/AnimalsProvider";
 import { databases, config, getConversations } from "@/lib/AppWrite";
 import { useGlobalContext } from "@/lib/global-provider";
+import { useStripe } from "@stripe/stripe-react-native";
+import { Screen } from "react-native-screens";
+
 const AnimalDetails = () => {
   const { sellerId, animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
   const [seller, setSeller] = useState();
   const [quantity, setQuantity] = useState(1);
-  const { animalsData, loading } = useAnimals();
+  const { animalsData } = useAnimals();
   const { userDetails } = useGlobalContext();
-
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const animal = animalsData.find((animal) => animal.$id === animalId);
     setAnimal(animal);
     setSeller(animal.supplier);
   }, [animalId]);
 
+  useEffect(() => {
+    initializePaymentSheet();
+  }, []);
+
   const handleStartChat = async () => {
-    console.log("A", sellerId);
-    console.log("B", seller);
     // Check if a conversation already exists with the user
     const conversations = await getConversations(userDetails.$id);
     let conversation = conversations.find((conv) =>
@@ -54,10 +61,62 @@ const AnimalDetails = () => {
     );
   };
 
+  const fetchPaymentSheetParams = async () => {
+    const priceInCents = totalPrice * 100;
+    const response = await fetch(`http://192.168.118.196:3000/payment-sheet`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ amount: priceInCents }),
+    });
+
+    const { paymentIntent, ephemeralKey, customer } = await response.json();
+
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
+  };
+
+  const initializePaymentSheet = async () => {
+    console.log("initializing oayment intent");
+    const { paymentIntent, ephemeralKey, customer } =
+      await fetchPaymentSheetParams();
+
+    const { error } = await initPaymentSheet({
+      merchantDisplayName: "Example, Inc.",
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
+      //methods that complete payment after a delay, like SEPA Debit and Sofort.
+      allowsDelayedPaymentMethods: false,
+      defaultBillingDetails: {
+        name: "Jane Doe",
+      },
+    });
+    if (!error) {
+      setLoading(true);
+    }
+  };
+
+  const openPaymentSheet = async () => {
+    const { error } = await presentPaymentSheet();
+
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      Alert.alert("Success", "Your order is confirmed!");
+    }
+  };
+
   if (!animal || !seller) {
     return <ActivityIndicator color="#CE4B26" size="large" />;
   }
   const totalPrice = animal.price * quantity;
+
   return (
     <>
       <SafeAreaView style={{ flex: 1 }}>
@@ -157,7 +216,10 @@ const AnimalDetails = () => {
               </View>
             </View>
             {/* Buy Now Button */}
-            <TouchableOpacity className="bg-primary rounded-md py-3  flex-row items-center justify-center">
+            <TouchableOpacity
+              onPress={openPaymentSheet}
+              className="bg-primary rounded-md py-3  flex-row items-center justify-center"
+            >
               <Ionicons name="cart" size={25} color="white" />
               <Text
                 className="text-white text-center text-lg "
