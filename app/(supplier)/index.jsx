@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSupplierAnimals } from "@/lib/SupplierAnimalsProvider";
 import { useGlobalContext } from "@/lib/global-provider";
 import { fetchAnimalsForCurrentUser } from "@/lib/AppWrite";
+import BellWithBadge from "@/components/BellWithBadge";
 const SupplierHome = () => {
   const router = useRouter();
   const { userDetails } = useGlobalContext();
@@ -81,9 +82,12 @@ const SupplierHome = () => {
   return (
     <SafeAreaView className="flex-1 bg-white px-6 py-4">
       <StatusBar backgroundColor="#CE4B26" />
-      <Text className="text-2xl text-gray-900 mb-6">{`Hello ${
-        userDetails ? userDetails.name : "Seller"
-      }`}</Text>
+      <View className="flex-row justify-between mb-6">
+        <Text className="text-2xl text-gray-900 ">{`Hello ${
+          userDetails ? userDetails.name : "Seller"
+        }`}</Text>
+        <BellWithBadge />
+      </View>
       <Text className="text-3xl font-bold text-gray-900 mb-6">My Animals</Text>
 
       {supplierAnimals.length === 0 ? (

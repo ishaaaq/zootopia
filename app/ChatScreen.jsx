@@ -85,24 +85,20 @@ const ChatScreen = () => {
     if (message.trim() === "") return;
 
     try {
-      // Save the message to Appwrite
-      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-        const newMessage = await sendMessage(conversationId, senderId, message);
+      const newMessage = await sendMessage(conversationId, senderId, message);
 
-        // Send the message to WebSocket server
-        // if (ws && ws.readyState === WebSocket.OPEN) {
-        //   ws.send(JSON.stringify(newMessage));
-        // } else {
-        //   console.error("WebSocket is not open. ReadyState:", ws?.readyState);
-        // }
-        ws.current.send(JSON.stringify(newMessage));
-        setMessage("");
-      } else {
-        console.error(
-          "WebSocket is not open. ReadyState:",
-          ws.current?.readyState
-        );
-      }
+      setMessage("");
+      // Save the message to Appwrite
+      // if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      //   const newMessage = await sendMessage(conversationId, senderId, message);
+      //   ws.current.send(JSON.stringify(newMessage));
+      //   setMessage("");
+      // } else {
+      //   console.error(
+      //     "WebSocket is not open. ReadyState:",
+      //     ws.current?.readyState
+      //   );
+      // }
     } catch (error) {
       console.error("Error sending message:", error.message);
     }

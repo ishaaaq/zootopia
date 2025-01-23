@@ -17,7 +17,7 @@ import { fetchAllAnimals } from "@/lib/AppWrite"; // Import Appwrite fetch logic
 import { useRouter } from "expo-router";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useAnimals } from "@/lib/AnimalsProvider";
-
+import BellWithBadge from "@/components/BellWithBadge";
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState("All");
@@ -100,13 +100,14 @@ const Index = () => {
             {`${userDetails.location}, Nigeria`}
           </Text>
         </View>
-        <View className="bg-white flex items-center justify-center shadow-md shadow-black-100 rounded-xl w-12 h-12">
+        <BellWithBadge />
+        {/* <View className="bg-white flex items-center justify-center shadow-md shadow-black-100 rounded-xl w-12 h-12">
           <Image
             source={icons.bell}
             resizeMode="contain"
             style={{ width: 25, height: 25 }}
           />
-        </View>
+        </View> */}
       </View>
 
       {/* Greeting */}
