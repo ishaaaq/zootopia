@@ -10,15 +10,15 @@ app.use(bodyParser.json());
 
 app.post("/payment-sheet", async (req, res) => {
   // Use an existing Customer ID if this is a returning customer.
-  const { amount } = req.body;
-  console.log("amount", amount);
+  // const { amount } = req.body;
+  // console.log("amount", amount);
   const customer = await stripe.customers.create();
   const ephemeralKey = await stripe.ephemeralKeys.create(
     { customer: customer.id },
     { apiVersion: "2024-12-18.acacia" }
   );
   const paymentIntent = await stripe.paymentIntents.create({
-    amount,
+    amount: 1099,
     currency: "usd",
     customer: customer.id,
     automatic_payment_methods: {
@@ -32,6 +32,33 @@ app.post("/payment-sheet", async (req, res) => {
     publishableKey:
       "pk_test_51QkOYFDEuPKQynMzxjlRReQLf0sVwIFKKODnb0FGIKzgRGW3UQYFoE0qmKkleLoVPFbPz6RDvr7wqBPBObeOGJw400iuUOkUBA",
   });
+});
+
+app.post("/stripe/create-account", async (req, res) => {
+  const { email } = req.body;
+  console.log("server");
+  try {
+    const account = await stripe.accounts.create({
+      type: "express",
+      email,
+      capabilities: {
+        transfers: { requested: true },
+      },
+    });
+
+    const link = await stripe.accountLinks.create({
+      account: account.id,
+      refresh_url:
+        " https://b367-102-91-104-203.ngrok-free.app/(supplier)/profile",
+      return_url: " https://b367-102-91-104-203.ngrok-free.app/(supplier)",
+      type: "account_onboarding",
+    });
+
+    res.json({ url: link.url, stripeAccountId: account.id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Failed to create Stripe account.");
+  }
 });
 
 // app.post("/create-payment-intent", async (req, res) => {
