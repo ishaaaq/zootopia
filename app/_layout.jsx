@@ -60,6 +60,7 @@ const RootLayout = () => {
                 name="GetStarted"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen name="HomePage" options={{ headerShown: false }} />
               <Stack.Screen name="(zoo)" options={{ headerShown: false }} />
               <Stack.Screen name="(buyer)" options={{ headerShown: false }} />
               <Stack.Screen

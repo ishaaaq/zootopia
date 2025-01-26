@@ -7,7 +7,7 @@ const GlobalContext = createContext(undefined);
 export const GlobalProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [initialRoute, setInitialRoute] = useState("GetStarted");
+  const [initialRoute, setInitialRoute] = useState("HomePage");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // const {
@@ -29,7 +29,7 @@ export const GlobalProvider = ({ children }) => {
       } catch (error) {
         console.error("Error fetching user details:", error);
         setIsLoggedIn(false);
-        setInitialRoute("GetStarted");
+        setInitialRoute("HomePage");
       } finally {
         setLoading(false);
       }

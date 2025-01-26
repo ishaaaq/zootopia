@@ -11,9 +11,9 @@ import SearchBar from "@/components/SearchBar";
 import CategoriesFilter from "@/components/CategoriesFilter";
 import Card from "@/components/Card";
 import FilterModal from "@/components/FilterModal";
-
+import icons from "@/constants/icons";
 import { Ionicons } from "@expo/vector-icons";
-
+import { fetchAllAnimals } from "@/lib/AppWrite"; // Import Appwrite fetch logic
 import { useRouter } from "expo-router";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useAnimals } from "@/lib/AnimalsProvider";
@@ -24,18 +24,17 @@ const Index = () => {
   const [priceRange, setPriceRange] = useState([0, 10000]); // Default range
   const [filteredAnimals, setFilteredAnimals] = useState([]);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
-  const [domesticAnimals, setDomesticAnimals] = useState();
-  const { userDetails } = useGlobalContext();
+  const [animals, setAnimals] = useState();
+  const { userDetails, isLoggedIn } = useGlobalContext();
   const { animalsData, error, loading } = useAnimals();
   const router = useRouter();
-  const [exotic, setExotic] = useState(false);
+  const [selectedType, setSelectedType] = useState("All");
 
   const toggleFilterModal = () => setFilterModalVisible(!isFilterModalVisible);
 
   // Filter Logic
   const applyFilters = () => {
-    console.log(domesticAnimals);
-    const filtered = domesticAnimals.filter((animal) => {
+    const filtered = animals.filter((animal) => {
       const matchesCategories =
         selectedCategories === "All" ||
         `${animal.category + "s"}`.toLowerCase() ===
@@ -45,10 +44,11 @@ const Index = () => {
         .includes(searchQuery.toLowerCase());
       const matchesPrice =
         animal.price >= priceRange[0] && animal.price <= priceRange[1];
-      const matchesExotic = exotic === false || animal.exoticPet === true;
+      const matchesType =
+        selectedType === "All" || animal.type === selectedType[0];
 
       return (
-        matchesCategories && matchesSearchQuery && matchesExotic && matchesPrice
+        matchesCategories && matchesSearchQuery && matchesType && matchesPrice
       );
     });
 
@@ -57,23 +57,20 @@ const Index = () => {
 
   useEffect(() => {
     if (animalsData) {
-      const domestic = animalsData.filter(
-        (animal) => animal.type === "domestic"
-      );
-      setDomesticAnimals(domestic);
-      setFilteredAnimals(domestic);
+      setAnimals(animalsData);
+      setFilteredAnimals(animalsData);
     }
   }, [animalsData]);
 
   // Reapply filters when filters are changed
   useEffect(() => {
-    if (searchQuery || selectedCategories !== "All" || exotic !== false) {
+    if (searchQuery || selectedCategories !== "All" || selectedType !== "All") {
       applyFilters();
     } else {
       // Reset to default display when no filters are applied
-      setFilteredAnimals(domesticAnimals);
+      setFilteredAnimals(animalsData);
     }
-  }, [searchQuery, selectedCategories, exotic, priceRange]);
+  }, [searchQuery, selectedCategories, selectedType, priceRange]);
 
   if (loading) {
     return (
@@ -93,17 +90,18 @@ const Index = () => {
       <View className="flex flex-row justify-between mb-4">
         <View className="flex-row items-center">
           <Ionicons name="location" color={"gray"} size={20} />
-          <Text className="text-xl font-tc-bold text-gray-500">Zootopia</Text>
+          <Text className="text-xl font-tc-bold text-gray-500">
+            {isLoggedIn ? `${userDetails.location}, Nigeria` : "Zootopia"}
+          </Text>
         </View>
         <BellWithBadge />
       </View>
 
       {/* Greeting */}
-      {userDetails ? (
-        <Text className="text-3xl font-tc-bold mt-auto">{`Hello ${userDetails.name}`}</Text>
-      ) : (
-        <ActivityIndicator size="small" color="#CE4B26" />
-      )}
+
+      <Text className="text-3xl font-tc-bold mt-auto">{`Hello ${
+        isLoggedIn ? userDetails.zooname : "there"
+      }`}</Text>
 
       {/* Search Bar */}
       <View className="flex flex-row justify-between mt-4">
@@ -169,7 +167,7 @@ const Index = () => {
         onClose={toggleFilterModal}
         onApplyFilters={(filters) => {
           setPriceRange(filters.priceRange);
-          setExotic(filters.exotic);
+          setSelectedType(filters.type);
           toggleFilterModal();
         }}
       />

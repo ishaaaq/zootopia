@@ -25,6 +25,7 @@ import { useGlobalContext } from "@/lib/global-provider";
 import { useStripe } from "@stripe/stripe-react-native";
 import { Screen } from "react-native-screens";
 import axios from "axios";
+import { showAlert } from "@/components/ShowAlert";
 
 const AnimalDetails = () => {
   const { sellerId, animalId } = useLocalSearchParams();
@@ -32,7 +33,7 @@ const AnimalDetails = () => {
   const [seller, setSeller] = useState();
   const [quantity, setQuantity] = useState(1);
   const { animalsData } = useAnimals();
-  const { userDetails } = useGlobalContext();
+  const { userDetails, isLoggedIn } = useGlobalContext();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
   const [transactionId, setTransactionId] = useState();
@@ -49,7 +50,7 @@ const AnimalDetails = () => {
     //   await createNotification(party, "successful transaction", "Your transaction was successful")
     // });
     await createNotification(
-      userDetails.$id,
+      userDetails?.$id,
       "Successful Purchase",
       `You just bought ${quantity} ${animal.name}`
     );
@@ -57,16 +58,18 @@ const AnimalDetails = () => {
       seller.$id,
       "You just made a sale",
       `Congratulations! ${quantity} of ${animal.name} was bought by ${
-        userDetails.name !== undefined ? userDetails.name : userDetails.zooname
+        userDetails?.name !== undefined
+          ? userDetails?.name
+          : userDetails?.zooname
       }`
     );
   };
 
   const handleStartChat = async () => {
     // Check if a conversation already exists with the user
-    const conversations = await getConversations(userDetails.$id);
+    const conversations = await getConversations(userDetails?.$id);
     let conversation = conversations.find((conv) =>
-      conv.participants.includes(seller.$id && userDetails.$id)
+      conv.participants.includes(seller.$id && userDetails?.$id)
     );
 
     if (!conversation) {
@@ -75,13 +78,13 @@ const AnimalDetails = () => {
         config.conversation,
         "unique()",
         {
-          participants: [userDetails.$id, seller.$id],
+          participants: [userDetails?.$id, seller.$id],
           timestamp: new Date(),
         }
       );
     }
     return router.push(
-      `/ChatScreen?conversationId=${conversation.$id}&participantName=${seller.name}&senderId=${userDetails.$id}`
+      `/ChatScreen?conversationId=${conversation.$id}&participantName=${seller.name}&senderId=${userDetails?.$id}`
     );
   };
 
@@ -166,7 +169,7 @@ const AnimalDetails = () => {
   const totalPrice = animal.price * quantity;
   const transactionDetails = {
     transactionId,
-    buyerId: userDetails.$id,
+    buyerId: userDetails?.$id,
     sellerId: seller.$id,
     amount: totalPrice,
     productName: animal.name,
@@ -240,7 +243,13 @@ const AnimalDetails = () => {
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity onPress={handleStartChat}>
+              <TouchableOpacity
+                onPress={
+                  isLoggedIn
+                    ? handleStartChat
+                    : () => showAlert("Please sign in to contact this seller")
+                }
+              >
                 <MaterialCommunityIcons
                   name="message"
                   size={30}
@@ -275,7 +284,11 @@ const AnimalDetails = () => {
             </View>
             {/* Buy Now Button */}
             <TouchableOpacity
-              onPress={initializePaymentSheet}
+              onPress={
+                isLoggedIn
+                  ? initializePaymentSheet
+                  : () => showAlert("You must be signed in to make payments")
+              }
               className="bg-primary rounded-md py-3  flex-row items-center justify-center"
               disabled={loading}
             >

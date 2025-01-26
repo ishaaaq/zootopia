@@ -12,7 +12,7 @@ import { useGlobalContext } from "@/lib/global-provider";
 import { Switch } from "react-native";
 const FilterModal = ({ isVisible, onClose, onApplyFilters }) => {
   const screenHeight = Dimensions.get("window").height;
-  const { userDetails } = useGlobalContext();
+  const { userDetails, isLoggedIn } = useGlobalContext();
   const [selectedType, setSelectedType] = useState(["All"]);
   const [exotic, setExotic] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 10000]);
@@ -73,7 +73,7 @@ const FilterModal = ({ isVisible, onClose, onApplyFilters }) => {
           <Text className="text-lg font-bold text-gray-700 mb-4">Filter</Text>
 
           {/* Type */}
-          {userDetails.usertype == "zoo" ? (
+          {userDetails?.usertype == "zoo" || !isLoggedIn ? (
             <View className="mb-6">
               <Text className="text-sm font-medium text-gray-500">Type</Text>
               <View className="flex-row flex-wrap mt-2">

@@ -4,13 +4,19 @@ import { useGlobalContext } from "@/lib/global-provider";
 import icons from "@/constants/icons";
 import { router } from "expo-router";
 import { useNotifications } from "@/lib/NotificationsContext";
+import { showAlert } from "@/components/ShowAlert";
 const BellWithBadge = () => {
+  const { isLoggedIn } = useGlobalContext();
   const { notifications } = useNotifications();
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <TouchableOpacity
-      onPress={() => router.push("/Notifications")}
+      onPress={
+        isLoggedIn
+          ? () => router.push("/Notifications")
+          : () => showAlert("Please login to view your notifications")
+      }
       className="bg-white relative p-2 flex items-center justify-center shadow-md shadow-black-100 rounded-xl w-12 h-12"
     >
       <Image
