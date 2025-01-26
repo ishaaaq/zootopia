@@ -1,28 +1,33 @@
 import React, { useState } from "react";
 import { View, Text } from "react-native";
-import Slider from "@react-native-community/slider";
-// import { styled } from "nativewind";
+import MultiSlider from "@ptomasroos/react-native-multi-slider";
 
-// const StyledSlider = styled(Slider);
-
-export default function RangleSlider() {
-  const [value, setValue] = useState(50);
-
+export default function RangeSlider({
+  min,
+  max,
+  steps,
+  values,
+  onValuesChange,
+}) {
   return (
-    <View className="flex-1 justify-center items-center bg-gray-100">
+    <View className="items-center p-4">
       <Text className="text-lg font-bold mb-4">
-        {"\u20A6"} {value}
+        Min: {values[0]} | Max: {values[1]}
       </Text>
-      <Slider
-        style={{ width: 300, height: 40 }}
-        minimumValue={100}
-        maximumValue={10000}
-        step={1}
-        minimumTrackTintColor="#CE4B26" // Tailwind's gray-800
-        maximumTrackTintColor="#d1d5db" // Tailwind's gray-300
-        thumbTintColor="#CE4B26" // Tailwind's blue-500
-        value={value}
-        onValueChange={(newValue) => setValue(newValue)}
+      <MultiSlider
+        values={values}
+        sliderLength={300}
+        onValuesChange={onValuesChange} // Handle change
+        min={min}
+        max={max}
+        step={steps}
+        selectedStyle={{ backgroundColor: "#CE4B26" }}
+        unselectedStyle={{ backgroundColor: "#d1d5db" }}
+        markerStyle={{
+          backgroundColor: "#CE4B26",
+          height: 20,
+          width: 20,
+        }} // Thumb style
       />
     </View>
   );

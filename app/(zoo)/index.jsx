@@ -22,13 +22,13 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState("All");
   const [priceRange, setPriceRange] = useState([0, 10000]); // Default range
-  // const [selectedCategories, setSelectedCategories] = useState([]);
   const [filteredAnimals, setFilteredAnimals] = useState([]);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [animals, setAnimals] = useState();
   const { userDetails } = useGlobalContext();
   const { animalsData, error, loading } = useAnimals();
   const router = useRouter();
+  const [selectedType, setSelectedType] = useState("All");
 
   const toggleFilterModal = () => setFilterModalVisible(!isFilterModalVisible);
 
@@ -42,15 +42,13 @@ const Index = () => {
       const matchesSearchQuery = animal.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-      // const matchesPrice =
-      //   animal.price >= priceRange[0] && animal.price <= priceRange[1];
-      // const matchesCategory =
-      //   selectedCategories.length === 0 ||
-      //   selectedCategories.includes(animal.category);
+      const matchesPrice =
+        animal.price >= priceRange[0] && animal.price <= priceRange[1];
+      const matchesType =
+        selectedType === "All" || animal.type === selectedType[0];
 
       return (
-        matchesCategories && matchesSearchQuery
-        //  &&matchesPrice /*&& matchesCategory*/
+        matchesCategories && matchesSearchQuery && matchesType && matchesPrice
       );
     });
 
@@ -66,17 +64,16 @@ const Index = () => {
 
   // Reapply filters when filters are changed
   useEffect(() => {
-    if (
-      searchQuery ||
-      selectedCategories !== "All"
-      // || selectedCategories.length > 0
-    ) {
+    if (searchQuery || selectedCategories !== "All" || selectedType !== "All") {
+      console.log("reapplying");
+      console.log(selectedCategories, selectedType, priceRange);
+      console.log(selectedType[0]);
       applyFilters();
     } else {
       // Reset to default display when no filters are applied
       setFilteredAnimals(animalsData);
     }
-  }, [searchQuery, selectedCategories /* priceRange  selectedCategories*/]);
+  }, [searchQuery, selectedCategories, selectedType, priceRange]);
 
   if (loading) {
     return (
@@ -101,13 +98,6 @@ const Index = () => {
           </Text>
         </View>
         <BellWithBadge />
-        {/* <View className="bg-white flex items-center justify-center shadow-md shadow-black-100 rounded-xl w-12 h-12">
-          <Image
-            source={icons.bell}
-            resizeMode="contain"
-            style={{ width: 25, height: 25 }}
-          />
-        </View> */}
       </View>
 
       {/* Greeting */}
@@ -156,16 +146,22 @@ const Index = () => {
         <ActivityIndicator size="large" color="#CE4B26" />
       ) : (
         <View className="flex flex-row flex-wrap justify-center w-full">
-          {filteredAnimals?.map((animal) => (
-            <View key={animal.$id} className="w-1/2">
-              <Card
-                {...animal}
-                onPress={() =>
-                  router.push(`/AnimalDetails?animalId=${animal.$id}`)
-                }
-              />
-            </View>
-          ))}
+          {filteredAnimals?.length > 0 ? (
+            filteredAnimals?.map((animal) => (
+              <View key={animal.$id} className="w-1/2">
+                <Card
+                  {...animal}
+                  onPress={() =>
+                    router.push(`/AnimalDetails?animalId=${animal.$id}`)
+                  }
+                />
+              </View>
+            ))
+          ) : (
+            <Text className="text-center mt-4 text-gray-500">
+              No animals match your filters.
+            </Text>
+          )}
         </View>
       )}
 
@@ -175,7 +171,7 @@ const Index = () => {
         onClose={toggleFilterModal}
         onApplyFilters={(filters) => {
           setPriceRange(filters.priceRange);
-          setSelectedCategories(filters.categories);
+          setSelectedType(filters.type);
           toggleFilterModal();
         }}
       />

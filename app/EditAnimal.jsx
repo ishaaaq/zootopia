@@ -205,7 +205,7 @@ const EditAnimal = () => {
               className="mb-4"
             />
             <Button
-              title={isSubmitting ? <ActivityIndicator /> : "Save"}
+              title={"Save"}
               onPress={handleSubmit}
               disabled={isSubmitting}
               className="bg-primary-500 text-white py-2 px-4 rounded-lg "

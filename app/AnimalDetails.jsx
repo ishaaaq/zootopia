@@ -14,10 +14,17 @@ import {
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAnimals } from "@/lib/AnimalsProvider";
-import { databases, config, getConversations } from "@/lib/AppWrite";
+import {
+  databases,
+  config,
+  getConversations,
+  createNotification,
+  saveTransaction,
+} from "@/lib/AppWrite";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useStripe } from "@stripe/stripe-react-native";
 import { Screen } from "react-native-screens";
+import axios from "axios";
 
 const AnimalDetails = () => {
   const { sellerId, animalId } = useLocalSearchParams();
@@ -28,15 +35,32 @@ const AnimalDetails = () => {
   const { userDetails } = useGlobalContext();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
+  const [transactionId, setTransactionId] = useState();
+
   useEffect(() => {
     const animal = animalsData.find((animal) => animal.$id === animalId);
     setAnimal(animal);
     setSeller(animal.supplier);
   }, [animalId]);
 
-  useEffect(() => {
-    initializePaymentSheet();
-  }, []);
+  const handleSuccessfulTransaction = async () => {
+    const transaction = await saveTransaction(transactionDetails);
+    // [userDetails.$id, seller.$id].forEach(async party => {
+    //   await createNotification(party, "successful transaction", "Your transaction was successful")
+    // });
+    await createNotification(
+      userDetails.$id,
+      "Successful Purchase",
+      `You just bought ${quantity} ${animal.name}`
+    );
+    await createNotification(
+      seller.$id,
+      "You just made a sale",
+      `Congratulations! ${quantity} of ${animal.name} was bought by ${
+        userDetails.name !== undefined ? userDetails.name : userDetails.zooname
+      }`
+    );
+  };
 
   const handleStartChat = async () => {
     // Check if a conversation already exists with the user
@@ -63,30 +87,49 @@ const AnimalDetails = () => {
 
   const fetchPaymentSheetParams = async () => {
     const priceInCents = totalPrice * 100;
-    const response = await fetch(`http://192.168.118.196:3000/payment-sheet`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ amount: priceInCents }),
-    });
+    try {
+      const sellerDetails = await databases.getDocument(
+        config.database,
+        config.supplier,
+        seller.$id
+      );
 
-    const { paymentIntent, ephemeralKey, customer } = await response.json();
-
-    return {
-      paymentIntent,
-      ephemeralKey,
-      customer,
-    };
+      const stripeAccountId = sellerDetails.stripeAccountId;
+      console.log(stripeAccountId);
+      const response = await axios.post(
+        `http://192.168.57.196:3000/payment-sheet`,
+        {
+          amount: priceInCents,
+          stripeAccountId: stripeAccountId,
+        }
+      );
+      console.log("response", response);
+      const { paymentIntent, ephemeralKey, customer, paymentIntentId } =
+        response.data;
+      setTransactionId(paymentIntentId);
+      return {
+        paymentIntent,
+        ephemeralKey,
+        customer,
+      };
+    } catch (error) {
+      console.error("this error:", error);
+    }
   };
 
   const initializePaymentSheet = async () => {
+    setLoading(true);
     console.log("initializing oayment intent");
     const { paymentIntent, ephemeralKey, customer } =
       await fetchPaymentSheetParams();
 
+    if (!paymentIntent) {
+      setLoading(false);
+      return;
+    }
+
     const { error } = await initPaymentSheet({
-      merchantDisplayName: "Example, Inc.",
+      merchantDisplayName: "Zootopia",
       customerId: customer,
       customerEphemeralKeySecret: ephemeralKey,
       paymentIntentClientSecret: paymentIntent,
@@ -98,8 +141,12 @@ const AnimalDetails = () => {
       },
     });
     if (!error) {
-      setLoading(true);
+      await openPaymentSheet();
+    } else {
+      console.error("Error initializing payment sheet:", error);
+      Alert.alert("Error", error.message);
     }
+    setLoading(false);
   };
 
   const openPaymentSheet = async () => {
@@ -109,6 +156,7 @@ const AnimalDetails = () => {
       Alert.alert(`Error code: ${error.code}`, error.message);
     } else {
       Alert.alert("Success", "Your order is confirmed!");
+      handleSuccessfulTransaction();
     }
   };
 
@@ -116,6 +164,16 @@ const AnimalDetails = () => {
     return <ActivityIndicator color="#CE4B26" size="large" />;
   }
   const totalPrice = animal.price * quantity;
+  const transactionDetails = {
+    transactionId,
+    buyerId: userDetails.$id,
+    sellerId: seller.$id,
+    amount: totalPrice,
+    productName: animal.name,
+    productQuantity: quantity,
+    paymentDate: new Date().toISOString(),
+    paymentStatus: "successful",
+  };
 
   return (
     <>
@@ -217,16 +275,24 @@ const AnimalDetails = () => {
             </View>
             {/* Buy Now Button */}
             <TouchableOpacity
-              onPress={openPaymentSheet}
+              onPress={initializePaymentSheet}
               className="bg-primary rounded-md py-3  flex-row items-center justify-center"
+              disabled={loading}
             >
-              <Ionicons name="cart" size={25} color="white" />
-              <Text
-                className="text-white text-center text-lg "
-                style={{ marginLeft: 10 }}
-              >
-                Proceed to checkout
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <>
+                  {" "}
+                  <Ionicons name="cart" size={25} color="white" />
+                  <Text
+                    className="text-white text-center text-lg "
+                    style={{ marginLeft: 10 }}
+                  >
+                    Proceed to checkout
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
         </ScrollView>

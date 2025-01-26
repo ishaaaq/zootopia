@@ -68,6 +68,23 @@ const ZooLayout = () => {
               ),
             }}
           />
+           {/* <Tabs.Screen
+            name="Transactions"
+            options={{
+              title: "Transactions",
+              headerShown: false,
+              tabBarIcon: ({ focused }) => (
+                <TabIcon
+                  icon={MaterialCommunityIcons}
+                  iconName={
+                    focused ? "clipboard-list" : "clipboard-list-outline"
+                  }
+                  focused={focused}
+                  title="Transactions"
+                />
+              ),
+            }}
+          /> */}
       {/* <Tabs.Screen
         name="Explore"
         options={{

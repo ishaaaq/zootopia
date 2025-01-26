@@ -5,14 +5,18 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useGlobalContext } from "@/lib/global-provider";
-import { logout } from "@/lib/AppWrite";
+import { logout, updateSellerStripeAccount } from "@/lib/AppWrite";
+import axios from "axios";
+
 const ProfilePage = () => {
   const { userDetails } = useGlobalContext();
   const [loading, setLoading] = useState(false);
+
   const handleLogout = async () => {
     setLoading(true);
     const res = await logout();
@@ -22,6 +26,28 @@ const ProfilePage = () => {
       return router.replace("../auth/Login");
     }
   };
+
+  const handleConnectToStripe = async () => {
+    console.log("starting");
+    try {
+      const response = await axios.post(
+        "http://192.168.57.196:3000/stripe/create-account",
+        {
+          sellerId: userDetails.$id, // Seller's ID
+          email: userDetails.email, // Seller's email
+        }
+      );
+
+      const { url, stripeAccountId } = response.data; // Stripe onboarding URL
+      console.log("url", url);
+      await updateSellerStripeAccount(userDetails.$id, stripeAccountId);
+      router.push(`../WebViewPage?url=${encodeURIComponent(url)}`); // Navigate to WebView page with the URL
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Failed to connect to Stripe.");
+    }
+  };
+
   return (
     <View className="flex-1 bg-white ">
       {/* Profile Header */}
@@ -29,7 +55,7 @@ const ProfilePage = () => {
         <View className="flex-col">
           <Text className="text-2xl font-tc-bold text-black">Profile</Text>
           <Text className="text-xl font-tc text-gray-600">
-            {userDetails?.name || userDetails.zooname}
+            {userDetails.name || userDetails.zooname}
           </Text>
         </View>
         {userDetails.Profile ? (
@@ -53,6 +79,23 @@ const ProfilePage = () => {
           <MaterialIcons name="edit" size={24} color="gray" />
           <Text className="text-base">Edit Profile</Text>
         </TouchableOpacity>
+
+        {userDetails.usertype === "supplier" ? (
+          userDetails.stripeAccountId == null ? (
+            <TouchableOpacity
+              className="flex-row items-center border-b-2  border-gray-300 h-15"
+              onPress={handleConnectToStripe}
+            >
+              <MaterialIcons name="wallet" size={24} color="gray" />
+              <Text className="text-base">Connect to stripe</Text>
+            </TouchableOpacity>
+          ) : (
+            <View className="flex-row items-center border-b-2  border-gray-300 h-15">
+              <MaterialIcons name="check-circle" size={24} color="green" />
+              <Text className="text-base">Stripe Account Connected</Text>
+            </View>
+          )
+        ) : null}
 
         <TouchableOpacity
           className="flex-row justify-between items-center border-b-2 border-gray-300 h-15"

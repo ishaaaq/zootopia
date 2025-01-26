@@ -13,7 +13,7 @@ const CategoriesFilter = ({
       className="flex-row mb-4 h-20"
     >
       {Categories?.map((category, index) => (
-        <View className="flex-col ">
+        <View key={index} className="flex-col ">
           <TouchableOpacity
             key={index}
             onPress={() => onSelectCategories(category.name)}

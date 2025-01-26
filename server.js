@@ -10,22 +10,29 @@ app.use(bodyParser.json());
 
 app.post("/payment-sheet", async (req, res) => {
   // Use an existing Customer ID if this is a returning customer.
-  // const { amount } = req.body;
-  // console.log("amount", amount);
+  const { amount, stripeAccountId } = req.body;
+  console.log("amount", amount, stripeAccountId);
   const customer = await stripe.customers.create();
   const ephemeralKey = await stripe.ephemeralKeys.create(
     { customer: customer.id },
     { apiVersion: "2024-12-18.acacia" }
   );
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: 1099,
+    amount: amount,
     currency: "usd",
     customer: customer.id,
     automatic_payment_methods: {
       enabled: true,
     },
+    // application_fee_amount: 123,
+    transfer_data: {
+      destination: "acct_1QkvavD5Zyzhe9mZ",
+    },
   });
+
+  console.log("paymentIntentId:", paymentIntent.id);
   res.json({
+    paymentIntentId: paymentIntent.id,
     paymentIntent: paymentIntent.client_secret,
     ephemeralKey: ephemeralKey.secret,
     customer: customer.id,
@@ -36,7 +43,6 @@ app.post("/payment-sheet", async (req, res) => {
 
 app.post("/stripe/create-account", async (req, res) => {
   const { email } = req.body;
-  console.log("server");
   try {
     const account = await stripe.accounts.create({
       type: "express",
@@ -60,23 +66,6 @@ app.post("/stripe/create-account", async (req, res) => {
     res.status(500).send("Failed to create Stripe account.");
   }
 });
-
-// app.post("/create-payment-intent", async (req, res) => {
-//   const { amount } = req.body;
-
-//   try {
-//     const paymentIntent = await stripe.paymentIntents.create({
-//       amount,
-//       currency: "usd",
-//     });
-
-//     res.send({
-//       clientSecret: paymentIntent.client_secret,
-//     });
-//   } catch (error) {
-//     res.status(500).send({ error: error.message });
-//   }
-// });
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");

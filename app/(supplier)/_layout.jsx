@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { Tabs } from "expo-router";
 import { ZoosProvider } from "@/lib/ZoosProvider";
 import { SellersProvider } from "@/lib/SellersProvider";
@@ -24,7 +24,7 @@ const TabIcon = ({ focused, IconComponent, iconName, title }) => (
   </View>
 );
 
-const ZooLayout = () => {
+const SupplierLayout = () => {
   return (
     <SellersProvider>
       <ZoosProvider>
@@ -109,6 +109,4 @@ const ZooLayout = () => {
   );
 };
 
-const styles = StyleSheet.create({});
-
-export default ZooLayout;
+export default SupplierLayout;
