@@ -38,7 +38,7 @@ const PetSupplierSignupForm = () => {
 
   const handleSubmit = async (values) => {
     const response = await signup("supplier", values);
-    if (response) router.replace("(supplier)");
+    if (response) router.replace("../Login");
   };
 
   return (

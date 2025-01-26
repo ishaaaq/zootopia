@@ -88,6 +88,12 @@ const LoginForm = () => {
             secureTextEntry={!showPassword}
             togglePassword={() => setShowPassword((prev) => !prev)}
           />
+          <View className="flex flex-row mb-2">
+            <Text className="text-gray-400">Don't have an account? </Text>
+            <TouchableOpacity onPress={() => router.push("../SelectUserType")}>
+              <Text className="underline text-gray-400">Sign Up</Text>
+            </TouchableOpacity>
+          </View>
           <FormButton
             title="Sign In"
             loading={loading}

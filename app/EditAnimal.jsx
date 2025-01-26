@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Switch,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -21,10 +22,13 @@ const EditAnimal = () => {
   const { animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
   const { supplierAnimals, loading, error } = useSupplierAnimals();
+  // const [isChecked, setIsChecked] = useState(false);
 
+  // const handleCheckboxChange = () => setIsChecked(!isChecked);
   useEffect(() => {
     const animal = supplierAnimals.find((animal) => animal.$id === animalId);
     setAnimal(animal);
+    // setIsChecked(animal.exoticPet);
   }, [animalId]);
 
   const validationSchema = Yup.object().shape({
@@ -40,6 +44,7 @@ const EditAnimal = () => {
       .required("Price is required")
       .min(10, "Price must be at least 10"),
     longDescription: Yup.string().required("Long description is required"),
+    exoticPet: Yup.boolean(),
   });
 
   // Handle form submission
@@ -82,7 +87,10 @@ const EditAnimal = () => {
   }
 
   return (
-    <ScrollView className="flex-1 px-4 py-6 mb-16 bg-white">
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      className="flex-1 px-4 py-6  bg-gray-100"
+    >
       <Text className="text-lg font-semibold text-gray-700 mb-4">
         Edit Animal
       </Text>
@@ -111,6 +119,7 @@ const EditAnimal = () => {
           quantity: animal.quantity || "",
           price: animal.price || "",
           longDescription: animal.longDescription || "",
+          // exoticPet: isChecked || false,
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -195,6 +204,23 @@ const EditAnimal = () => {
               keyboardType="numeric"
               className="mb-4"
             />
+            {/* <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                padding: 10,
+              }}
+            >
+              <Switch
+                value={values.exoticPet}
+                onValueChange={handleCheckboxChange}
+                trackColor={{ false: "#d1d5db", true: "#CE4B26" }}
+                thumbColor={isChecked ? "#CE4B26" : "#f4f4f5"}
+              />
+              <Text className="text-gray-700">
+                Is this Animal an exotic pet?
+              </Text>
+            </View> */}
             <InputField
               label="Long Description"
               value={values.longDescription}
@@ -202,14 +228,14 @@ const EditAnimal = () => {
               onBlur={handleBlur("longDescription")}
               error={touched.longDescription && errors.longDescription}
               multiline
-              className="mb-4"
+              className="mb-0"
             />
-            <Button
-              title={"Save"}
+            <TouchableOpacity
+              className=" bg-primary-500 py-4 rounded-lg mb-10"
               onPress={handleSubmit}
-              disabled={isSubmitting}
-              className="bg-primary-500 text-white py-2 px-4 rounded-lg "
-            />
+            >
+              <Text className="text-white text-center font-bold">Save</Text>
+            </TouchableOpacity>{" "}
           </View>
         )}
       </Formik>

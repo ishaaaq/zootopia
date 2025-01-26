@@ -4,9 +4,9 @@ import MessagesPage from "../../components/MessagesPage";
 
 const Messages = () => {
   return (
-    <View>
+    <>
       <MessagesPage />
-    </View>
+    </>
   );
 };
 

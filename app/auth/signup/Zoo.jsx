@@ -71,7 +71,7 @@ const ZooSignupForm = () => {
       setLoading(true);
       const response = await signup("zoo", values);
       if (response) {
-        router.replace("/auth/login");
+        router.replace("../Login");
       }
     } catch (error) {
       Alert.alert("Sign up error: ", error.message);

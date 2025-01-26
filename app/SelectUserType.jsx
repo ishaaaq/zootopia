@@ -29,13 +29,17 @@ const SelectUserType = () => {
             onPress={() => handleUserTypeSelection(userType)}
             style={{
               backgroundColor:
-                selectedUserType === userType ? "#4CAF50" : "#E0E0E0",
+                selectedUserType === userType ? "#CE4B26" : "#E0E0E0",
               padding: 20,
               borderRadius: 10,
               alignItems: "center",
             }}
           >
-            <Text className="text-xl font-semibold">
+            <Text
+              className={`text-xl font-semibold ${
+                selectedUserType === userType ? "text-white" : "text-gray-800"
+              }`}
+            >
               {userType === "Zoo"
                 ? "Zoo"
                 : userType === "PetBuyer"

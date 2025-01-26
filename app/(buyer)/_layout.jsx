@@ -1,12 +1,7 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import ReusableLayout from "../../components/ReusableLayout";
+const Layout = () => {
+  return <ReusableLayout />;
+};
 
-export default function PetBuyerLayout() {
-  return (
-    <Tabs>
-      <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="AnotherPage" options={{ title: "Explore" }} />
-      {/* <Tabs.Screen name="cart" options={{ title: 'Cart' }} /> */}
-    </Tabs>
-  );
-}
+export default Layout;

@@ -65,9 +65,6 @@ const Index = () => {
   // Reapply filters when filters are changed
   useEffect(() => {
     if (searchQuery || selectedCategories !== "All" || selectedType !== "All") {
-      console.log("reapplying");
-      console.log(selectedCategories, selectedType, priceRange);
-      console.log(selectedType[0]);
       applyFilters();
     } else {
       // Reset to default display when no filters are applied

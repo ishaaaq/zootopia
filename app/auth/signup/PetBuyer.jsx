@@ -6,17 +6,18 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { Ionicons } from "@expo/vector-icons";
+import { signup } from "@/lib/AppWrite";
 import InputField from "@/components/InputField";
 import FormButton from "@/components/FormButton";
+import { router } from "expo-router";
 const PetBuyerSignupForm = () => {
   const [showPassword, setShowPassword] = useState({
     password: false,
     confirmPassword: false,
   });
+  const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
@@ -34,6 +35,13 @@ const PetBuyerSignupForm = () => {
       .required("Confirm Password is required"),
   });
 
+  const handleSubmit = async (values) => {
+    setLoading(true);
+    const response = await signup("buyer", values);
+    if (response) router.replace("../Login");
+    setLoading(false);
+  };
+
   return (
     <Formik
       initialValues={{
@@ -44,7 +52,7 @@ const PetBuyerSignupForm = () => {
         confirmPassword: "",
       }}
       validationSchema={validationSchema}
-      onSubmit={(values) => console.log(values)}
+      onSubmit={(values) => handleSubmit(values)}
     >
       {({
         values,
@@ -126,7 +134,11 @@ const PetBuyerSignupForm = () => {
             }
           />
 
-          <FormButton title="Sign Up" onPress={handleSubmit} />
+          <FormButton
+            title="Sign Up"
+            loading={loading}
+            onPress={handleSubmit}
+          />
         </ScrollView>
       )}
     </Formik>

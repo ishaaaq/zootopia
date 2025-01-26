@@ -8,29 +8,31 @@ import {
   Image,
   Modal,
   ScrollView,
+  Switch,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { router } from "expo-router";
 import { InputField } from "../components/NewInput";
 import { useGlobalContext } from "@/lib/global-provider";
 import { addAnimal } from "@/lib/AppWrite";
-import sadpup from "@/assets/images/animals/criollo.jpg";
-import { launchImageLibrary } from "react-native-image-picker";
 import { DropdownField } from "../components/NewInput";
+import * as ImagePicker from "expo-image-picker";
 const AddAnimal = () => {
   const [photo, setPhoto] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [successVisible, setSuccessVisible] = useState(false);
   const { userDetails, user } = useGlobalContext();
+  const [isChecked, setIsChecked] = useState(false);
+
+  const toggleCheckbox = () => setIsChecked(!isChecked);
   const handleImagePicker = () => {
     setModalVisible(true);
   };
 
   const handleSubmit = async (values) => {
     const supplierId = userDetails.$id;
-    const response = await addAnimal(supplierId, photo, values);
+    const response = await addAnimal(supplierId, photo, values, isChecked);
     if (response) setSuccessVisible(true);
   };
 
@@ -38,12 +40,20 @@ const AddAnimal = () => {
     try {
       setModalVisible(false);
 
-      const result = await launchImageLibrary({
-        mediaType: "photo",
-        quality: 1,
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        alert("Permission to access gallery is required!");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1, // High-quality images
       });
 
-      if (!result.didCancel && result.assets) {
+      if (!result.canceled) {
         const file = result.assets[0];
         console.log("file:", file);
         return {
@@ -86,7 +96,7 @@ const AddAnimal = () => {
   });
 
   return (
-    <ScrollView className="flex-1 bg-gray-100 p-4 mb-15">
+    <ScrollView className="flex-1 bg-gray-100 p-4">
       <TouchableOpacity
         onPress={() => router.back()}
         className="bg-white p-2 rounded-lg shadow-sm w-10 mb-2"
@@ -226,6 +236,23 @@ const AddAnimal = () => {
               error={errors.price}
               touched={touched.price}
             />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                padding: 10,
+              }}
+            >
+              <Switch
+                value={isChecked}
+                onValueChange={toggleCheckbox}
+                trackColor={{ false: "#d1d5db", true: "#CE4B26" }}
+                thumbColor={isChecked ? "#CE4B26" : "#f4f4f5"}
+              />
+              <Text className="text-gray-700">
+                Is this Animal an exotic pet?
+              </Text>
+            </View>
             {/* Long Description */}
             <InputField
               label="Detailed Description"
