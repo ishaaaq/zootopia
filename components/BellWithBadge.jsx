@@ -6,14 +6,14 @@ import { router } from "expo-router";
 import { useNotifications } from "@/lib/NotificationsContext";
 import { showAlert } from "@/components/ShowAlert";
 const BellWithBadge = () => {
-  const { isLoggedIn } = useGlobalContext();
+  const { userDetails } = useGlobalContext();
   const { notifications } = useNotifications();
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <TouchableOpacity
       onPress={
-        isLoggedIn
+        userDetails
           ? () => router.push("/Notifications")
           : () => showAlert("Please login to view your notifications")
       }

@@ -4,9 +4,37 @@ const SECRET_KEY =
 const express = require("express");
 const stripe = require("stripe")(SECRET_KEY);
 const bodyParser = require("body-parser");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
 app.use(bodyParser.json());
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(`⚡ User Connected: ${socket.id}`);
+
+  socket.on("send_message", (data) => {
+    console.log("Message Received: ", data);
+
+    socket.broadcast.emit("receive_message", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
+
+httpServer.listen(4000, () => {
+  console.log("second server");
+});
 
 app.post("/payment-sheet", async (req, res) => {
   // Use an existing Customer ID if this is a returning customer.
@@ -67,9 +95,9 @@ app.post("/stripe/create-account", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
+// app.listen(3000, () => {
+//   console.log("Server is running on port 3000");
+// });
 
 // const WebSocket = require("ws");
 // const http = require("http");

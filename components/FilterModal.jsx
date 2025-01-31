@@ -73,7 +73,7 @@ const FilterModal = ({ isVisible, onClose, onApplyFilters }) => {
           <Text className="text-lg font-bold text-gray-700 mb-4">Filter</Text>
 
           {/* Type */}
-          {userDetails?.usertype == "zoo" || !isLoggedIn ? (
+          {userDetails?.usertype == "zoo" ? (
             <View className="mb-6">
               <Text className="text-sm font-medium text-gray-500">Type</Text>
               <View className="flex-row flex-wrap mt-2">

@@ -91,7 +91,7 @@ const Index = () => {
         <View className="flex-row items-center">
           <Ionicons name="location" color={"gray"} size={20} />
           <Text className="text-xl font-tc-bold text-gray-500">
-            {isLoggedIn ? `${userDetails.location}, Nigeria` : "Zootopia"}
+            {userDetails ? `${userDetails.location}, Nigeria` : "Zootopia"}
           </Text>
         </View>
         <BellWithBadge />
@@ -100,7 +100,7 @@ const Index = () => {
       {/* Greeting */}
 
       <Text className="text-3xl font-tc-bold mt-auto">{`Hello ${
-        isLoggedIn ? userDetails.zooname : "there"
+        userDetails ? userDetails.zooname : "there"
       }`}</Text>
 
       {/* Search Bar */}

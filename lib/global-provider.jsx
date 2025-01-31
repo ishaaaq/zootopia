@@ -27,7 +27,6 @@ export const GlobalProvider = ({ children }) => {
         setIsLoggedIn(true);
         setInitialRoute(`${user.usertype}`);
       } catch (error) {
-        console.error("Error fetching user details:", error);
         setIsLoggedIn(false);
         setInitialRoute("HomePage");
       } finally {

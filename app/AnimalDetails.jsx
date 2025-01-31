@@ -26,7 +26,7 @@ import { useStripe } from "@stripe/stripe-react-native";
 import { Screen } from "react-native-screens";
 import axios from "axios";
 import { showAlert } from "@/components/ShowAlert";
-
+import { fetchTransactions } from "@/lib/AppWrite";
 const AnimalDetails = () => {
   const { sellerId, animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
@@ -63,13 +63,14 @@ const AnimalDetails = () => {
           : userDetails?.zooname
       }`
     );
+    fetchTransactions(userDetails?.$id);
   };
 
   const handleStartChat = async () => {
     // Check if a conversation already exists with the user
-    const conversations = await getConversations(userDetails?.$id);
+    const conversations = await getConversations(userDetails.$id);
     let conversation = conversations.find((conv) =>
-      conv.participants.includes(seller.$id && userDetails?.$id)
+      conv.participants.includes(seller.$id && userDetails.$id)
     );
 
     if (!conversation) {
@@ -78,13 +79,13 @@ const AnimalDetails = () => {
         config.conversation,
         "unique()",
         {
-          participants: [userDetails?.$id, seller.$id],
+          participants: [userDetails.$id, seller.$id],
           timestamp: new Date(),
         }
       );
     }
     return router.push(
-      `/ChatScreen?conversationId=${conversation.$id}&participantName=${seller.name}&senderId=${userDetails?.$id}`
+      `/ChatScreen?conversationId=${conversation.$id}&participantName=${seller.name}&senderId=${userDetails.$id}`
     );
   };
 
@@ -207,8 +208,8 @@ const AnimalDetails = () => {
                 { label: "Quantity", value: animal.quantity },
                 { label: "Price", value: `$${animal.price}` },
                 {
-                  label: animal.breed !== "" ? "Breed" : "Category",
-                  value: animal.breed !== "" ? animal.breed : animal.category,
+                  label: animal.breed !== null ? "Breed" : "Category",
+                  value: animal.breed !== null ? animal.breed : animal.category,
                 },
               ].map((item, index) => (
                 <View
@@ -245,7 +246,7 @@ const AnimalDetails = () => {
               </View>
               <TouchableOpacity
                 onPress={
-                  isLoggedIn
+                  userDetails
                     ? handleStartChat
                     : () => showAlert("Please sign in to contact this seller")
                 }
@@ -285,7 +286,7 @@ const AnimalDetails = () => {
             {/* Buy Now Button */}
             <TouchableOpacity
               onPress={
-                isLoggedIn
+                userDetails
                   ? initializePaymentSheet
                   : () => showAlert("You must be signed in to make payments")
               }

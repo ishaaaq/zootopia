@@ -18,7 +18,7 @@ import { deleteAnimal } from "@/lib/AppWrite";
 const MyAnimalDetails = () => {
   const { animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
-  const { supplierAnimals, loading, error } = useSupplierAnimals();
+  const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
@@ -35,6 +35,7 @@ const MyAnimalDetails = () => {
       await deleteAnimal(animal.$id);
       Alert.alert("Success", "Animal deleted successfully");
       setModalVisible(false);
+      refetch();
     } catch (error) {
       Alert.alert("Error", error.message);
     }
@@ -58,10 +59,7 @@ const MyAnimalDetails = () => {
 
   return (
     <>
-      <SafeAreaView
-        style={{ height: "full", width: "100%" }}
-        className="flex-1"
-      >
+      <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {/* Animal Image */}
           <View style={{ height: "50%", width: "100%" }} className="relative">
@@ -91,13 +89,13 @@ const MyAnimalDetails = () => {
                 { label: "Quantity", value: animal.quantity },
                 { label: "Price", value: `$${animal.price}` },
                 {
-                  label: animal.breed !== "" ? "Breed" : "Category",
-                  value: animal.breed !== "" ? animal.breed : animal.category,
+                  label: animal.breed !== null ? "Breed" : "Category",
+                  value: animal.breed !== null ? animal.breed : animal.category,
                 },
               ].map((item, index) => (
                 <View
                   key={index}
-                  style={{ width: 110, height: 120 }}
+                  style={{ width: 90, height: 100 }}
                   className=" bg-white rounded-lg shadow-md flex flex-col justify-center px-2"
                 >
                   <Text className="text-primary font-tc-bold text-center text-2xl">
@@ -143,35 +141,36 @@ const MyAnimalDetails = () => {
               </TouchableOpacity>
             </View>
           </View>
-        </ScrollView>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-            <View className="bg-white rounded-lg p-6 w-80">
-              <Text className="text-lg font-bold mb-4 text-center">
-                Are you sure you want to delete this animal?
-              </Text>
-              <View className="flex-row justify-between">
-                <TouchableOpacity
-                  className="bg-gray-300 p-2 rounded-lg flex-1 mr-2"
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text className="text-center text-white">Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="bg-red-500 p-2 rounded-lg flex-1 ml-2"
-                  onPress={handleDelete}
-                >
-                  <Text className="text-center text-white">Yes</Text>
-                </TouchableOpacity>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+              <View className="bg-white rounded-lg p-6 w-80">
+                <Text className="text-lg font-bold mb-4 text-center">
+                  Are you sure you want to delete this animal?
+                </Text>
+                <View className="flex-row justify-between">
+                  <TouchableOpacity
+                    className="bg-gray-300 p-2 rounded-lg flex-1 mr-2"
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text className="text-center text-white">Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className="bg-red-500 p-2 rounded-lg flex-1 ml-2"
+                    onPress={handleDelete}
+                  >
+                    <Text className="text-center text-white">Yes</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        </Modal>
+          </Modal>
+        </ScrollView>
       </SafeAreaView>
     </>
   );

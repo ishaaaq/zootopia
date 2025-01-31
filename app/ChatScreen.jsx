@@ -10,11 +10,15 @@ import { sendMessage, databases, config } from "@/lib/AppWrite";
 import { useGlobalSearchParams } from "expo-router";
 import { Query } from "react-native-appwrite";
 import { useNavigation } from "@react-navigation/native";
+import socket from "@/socket";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const ChatScreen = () => {
   const { conversationId, participantName, senderId } = useGlobalSearchParams(); // Passed when navigating to this screen
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  // const [ws, setWs] = useState(null);
+  const messagesRef = useRef([]);
+
   const navigation = useNavigation();
 
   useLayoutEffect(() => {
@@ -23,17 +27,35 @@ const ChatScreen = () => {
     });
   }, [navigation, participantName]);
 
-  const ws = useRef(null);
   useEffect(() => {
-    // Fetch initial messages
+    const loadCachedMessages = async () => {
+      const cachedMessages = await AsyncStorage.getItem(
+        `chat_${conversationId}`
+      );
+      if (cachedMessages) {
+        setMessages(JSON.parse(cachedMessages));
+      }
+    };
+
+    loadCachedMessages();
+
     const fetchMessages = async () => {
       try {
         const response = await databases.listDocuments(
           config.database,
           config.message,
-          [Query.equal("conversationId", conversationId)]
+          [
+            Query.equal("conversationId", conversationId),
+            // Query.orderDesc("timestamp"),
+          ]
         );
+        messagesRef.current = response.documents; // Store messages in ref
+
         setMessages(response.documents);
+        await AsyncStorage.setItem(
+          `chat_${conversationId}`,
+          JSON.stringify(response.documents)
+        );
       } catch (error) {
         console.error("Error fetching messages:", error.message);
       }
@@ -41,72 +63,42 @@ const ChatScreen = () => {
 
     fetchMessages();
 
-    ws.current = new WebSocket("ws://localhost:8000");
+    socket.on("receive_message", (data) => {
+      messagesRef.current = [...messagesRef.current, data]; // Update ref first
+      setMessages([...messagesRef.current]); // Then update state
+    });
 
-    ws.current.onopen = () => {
-      console.log("WebSocket connection opened");
-    };
-
-    ws.current.onclose = (event) => {
-      console.log("WebSocket connection closed", event);
-    };
-
-    ws.current.onerror = (error) => {
-      console.error("WebSocket error", error);
-    };
-
-    // const socket = new WebSocket("ws://localhost:8000");
-    // setWs(socket);
-
-    ws.current.onmessage = (event) => {
-      console.log("WebSocket message event:", event);
-      try {
-        const newMessage = JSON.parse(event.data);
-        console.log("Parsed message:", newMessage);
-        if (newMessage.conversationId === conversationId) {
-          setMessages((prev) => [...prev, newMessage]);
-        }
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error.message);
-      }
-    };
-
-    // return () => {
-    //   socket.close();
-    // };
     return () => {
-      if (ws.current) {
-        ws.current.close();
-      }
+      socket.off("receive_message");
     };
   }, [conversationId]);
 
   const handleSend = async () => {
-    if (message.trim() === "") return;
+    // if (message.trim()) {
+    //   const newMessage = await sendMessage(conversationId, senderId, message);
+    //   setMessages((prevMessages) => [...prevMessages, newMessage]);
+    //   socket.emit("send_message", newMessage);
+    //   setMessage("");
+    // }
 
-    try {
-      const newMessage = await sendMessage(conversationId, senderId, message);
-
+    if (message.trim()) {
+      const tempMessage = {
+        $id: Date.now().toString(),
+        message,
+        senderId,
+        conversationId,
+      };
       setMessage("");
-      // Save the message to Appwrite
-      // if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      //   const newMessage = await sendMessage(conversationId, senderId, message);
-      //   ws.current.send(JSON.stringify(newMessage));
-      //   setMessage("");
-      // } else {
-      //   console.error(
-      //     "WebSocket is not open. ReadyState:",
-      //     ws.current?.readyState
-      //   );
-      // }
-    } catch (error) {
-      console.error("Error sending message:", error.message);
+      setMessages((prev) => [...prev, tempMessage]); // Show message instantly
+
+      socket.emit("send_message", tempMessage);
+
+      await sendMessage(conversationId, senderId, message); // Send to Appwrite
     }
   };
 
   return (
     <View className="flex-1 bg-gray px-2">
-      <View></View>
       <FlatList
         data={messages}
         keyExtractor={(item) => item.$id}
@@ -121,6 +113,7 @@ const ChatScreen = () => {
             {item.message}
           </Text>
         )}
+        // inverted
       />
       <View className="flex-row items-center p-4">
         <TextInput

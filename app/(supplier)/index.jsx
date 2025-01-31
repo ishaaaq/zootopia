@@ -69,7 +69,7 @@ const SupplierHome = () => {
         <Text className="text-sm text-gray-600">
           {item.category} - {item.quantity}
         </Text>
-        <Text className="text-lg font-bold text-primary-800">{`N${item.price}`}</Text>
+        <Text className="text-lg font-bold text-primary-800">{`$${item.price}`}</Text>
       </View>
       <TouchableOpacity
         onPress={() => router.push(`/EditAnimal?animalId=${item.$id}`)}
@@ -117,6 +117,8 @@ const SupplierHome = () => {
           renderItem={renderAnimalCard}
           keyExtractor={(item) => item.$id}
           contentContainerStyle={{ paddingBottom: 20 }}
+          onRefresh={() => refetch()}
+          refreshing={loading}
           ListFooterComponent={
             <TouchableOpacity
               className="flex-row items-center justify-center bg-primary-300 rounded-lg px-6 py-3 mt-4"
@@ -130,6 +132,7 @@ const SupplierHome = () => {
           }
         />
       )}
+      <View className="bg-white h-20"></View>
     </SafeAreaView>
   );
 };
