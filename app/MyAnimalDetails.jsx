@@ -15,20 +15,52 @@ import {
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSupplierAnimals } from "@/lib/SupplierAnimalsProvider";
 import { deleteAnimal } from "@/lib/AppWrite";
+import { fetchAnimalsForCurrentUser } from "@/lib/AppWrite";
+import { useAppwrite } from "@/lib/UseAppwrite";
 const MyAnimalDetails = () => {
   const { animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
-  const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
+  const [loading, setLoading] = useState(true);
+  const [supplierAnimals, setSupplierAnimals] = useState([]);
+
+  // const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
   const [modalVisible, setModalVisible] = useState(false);
 
+  // const {
+  //   data: supplierAnimals,
+  //   error,
+  //   loading,
+  //   refetch,
+  // } = useAppwrite({
+  //   fn: fetchAnimalsForCurrentUser,
+  // });
+  const fetchAnimals = async () => {
+    try {
+      setLoading(true);
+      const response = await fetchAnimalsForCurrentUser();
+      console.log("response", response);
+      setSupplierAnimals(response);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  console.log("asdasdadfc", supplierAnimals);
   useEffect(() => {
+    // console.log("animals:", animals);
     if (supplierAnimals) {
       const animal = supplierAnimals.find((animal) => animal.$id === animalId);
       setAnimal(animal);
     }
+
     console.log(supplierAnimals);
+    console.log(animal);
     console.log(animalId);
-  }, [animalId]);
+  }, [animalId, supplierAnimals]);
+  useEffect(() => {
+    fetchAnimals();
+  }, []);
 
   const handleDelete = async () => {
     try {
@@ -44,18 +76,13 @@ const MyAnimalDetails = () => {
   if (loading) {
     return (
       <View className="mx-auto my-auto">
-        <Text>loading</Text>
         <ActivityIndicator color="#CE4B26" size="large" />
       </View>
     );
   }
-  if (error) {
-    return <Text>Error: {error.message}</Text>;
-  }
-
-  if (!animal) {
-    return <ActivityIndicator color="#CE4B26" size="large" />;
-  }
+  // if (error) {
+  //   return <Text>Error: {error.message}</Text>;
+  // }
 
   return (
     <>
@@ -64,7 +91,7 @@ const MyAnimalDetails = () => {
           {/* Animal Image */}
           <View style={{ height: "50%", width: "100%" }} className="relative">
             <Image
-              source={{ uri: animal.image }}
+              source={{ uri: animal?.image }}
               style={{ resizeMode: "cover", height: "100%", width: "100%" }}
             />
             <TouchableOpacity
@@ -82,15 +109,16 @@ const MyAnimalDetails = () => {
             className="mt-[-40px] w-full rounded-t-3xl bg-gray-100 p-4"
           >
             <Text className="text-2xl font-bold text-gray-800">
-              {animal.shortDescription}
+              {animal?.shortDescription}
             </Text>
             <View className="flex flex-row justify-between bg-yellow w-100% mt-4">
               {[
-                { label: "Quantity", value: animal.quantity },
-                { label: "Price", value: `$${animal.price}` },
+                { label: "Quantity", value: animal?.quantity },
+                { label: "Price", value: `$${animal?.price}` },
                 {
-                  label: animal.breed !== null ? "Breed" : "Category",
-                  value: animal.breed !== null ? animal.breed : animal.category,
+                  label: animal?.breed !== null ? "Breed" : "Category",
+                  value:
+                    animal?.breed !== null ? animal?.breed : animal?.category,
                 },
               ].map((item, index) => (
                 <View
@@ -110,12 +138,12 @@ const MyAnimalDetails = () => {
 
             <Text className="text-lg text-gray-800 mt-2">Description:</Text>
             <Text className="text-sm text-gray-800">
-              {animal.longDescription}
+              {animal?.longDescription}
             </Text>
             <View style={{ marginTop: "10%" }}>
               <TouchableOpacity
                 onPress={() =>
-                  router.push(`/EditAnimal?animalId=${animal.$id}`)
+                  router.push(`/EditAnimal?animalId=${animal?.$id}`)
                 }
                 className="bg-primary rounded-md py-3 mt-3 flex-row items-center justify-center"
               >

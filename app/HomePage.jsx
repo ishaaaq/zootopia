@@ -18,6 +18,7 @@ import { useRouter } from "expo-router";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useAnimals } from "@/lib/AnimalsProvider";
 import BellWithBadge from "@/components/BellWithBadge";
+import Help from "@/components/Help";
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState("All");
@@ -94,7 +95,10 @@ const Index = () => {
             {userDetails ? `${userDetails.location}, Nigeria` : "Zootopia"}
           </Text>
         </View>
-        <BellWithBadge />
+        <View className=" flex-row gap-2">
+          <Help />
+          <BellWithBadge />
+        </View>
       </View>
 
       {/* Greeting */}

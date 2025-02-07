@@ -20,6 +20,7 @@ import {
   getConversations,
   createNotification,
   saveTransaction,
+  updateAnimal,
 } from "@/lib/AppWrite";
 import { useGlobalContext } from "@/lib/global-provider";
 import { useStripe } from "@stripe/stripe-react-native";
@@ -27,22 +28,47 @@ import { Screen } from "react-native-screens";
 import axios from "axios";
 import { showAlert } from "@/components/ShowAlert";
 import { fetchTransactions } from "@/lib/AppWrite";
+import { useConversations } from "@/lib/ConversationsContext";
 const AnimalDetails = () => {
   const { sellerId, animalId } = useLocalSearchParams();
   const [animal, setAnimal] = useState();
   const [seller, setSeller] = useState();
   const [quantity, setQuantity] = useState(1);
-  const { animalsData } = useAnimals();
+  const { animalsData, refetch } = useAnimals();
   const { userDetails, isLoggedIn } = useGlobalContext();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
   const [transactionId, setTransactionId] = useState();
+  const { fetchConversations } = useConversations();
 
   useEffect(() => {
     const animal = animalsData.find((animal) => animal.$id === animalId);
     setAnimal(animal);
     setSeller(animal.supplier);
   }, [animalId]);
+
+  const placeOrder = async () => {
+    const conversations = await getConversations(userDetails.$id);
+    let conversation = conversations.find((conv) =>
+      conv.participants.includes(seller.$id)
+    );
+
+    if (!conversation) {
+      conversation = await databases.createDocument(
+        config.database,
+        config.conversation,
+        "unique()",
+        {
+          participants: [userDetails.$id, seller.$id],
+          timestamp: new Date(),
+        }
+      );
+    }
+    fetchConversations();
+    return router.push(
+      `/ChatScreen?conversationId=${conversation.$id}&participantName=${seller.name}&senderId=${userDetails.$id}&order=${animal.name}`
+    );
+  };
 
   const handleSuccessfulTransaction = async () => {
     const transaction = await saveTransaction(transactionDetails);
@@ -63,6 +89,8 @@ const AnimalDetails = () => {
           : userDetails?.zooname
       }`
     );
+    await updateAnimal(animalId, { quantity: animal.quantity - quantity });
+    refetch();
     fetchTransactions(userDetails?.$id);
   };
 
@@ -70,7 +98,7 @@ const AnimalDetails = () => {
     // Check if a conversation already exists with the user
     const conversations = await getConversations(userDetails.$id);
     let conversation = conversations.find((conv) =>
-      conv.participants.includes(seller.$id && userDetails.$id)
+      conv.participants.includes(seller.$id)
     );
 
     if (!conversation) {
@@ -84,6 +112,7 @@ const AnimalDetails = () => {
         }
       );
     }
+    fetchConversations();
     return router.push(
       `/ChatScreen?conversationId=${conversation.$id}&participantName=${seller.name}&senderId=${userDetails.$id}`
     );
@@ -101,13 +130,12 @@ const AnimalDetails = () => {
       const stripeAccountId = sellerDetails.stripeAccountId;
       console.log(stripeAccountId);
       const response = await axios.post(
-        `http://192.168.57.196:3000/payment-sheet`,
+        `http://192.168.211.196:3000/payment-sheet`,
         {
           amount: priceInCents,
           stripeAccountId: stripeAccountId,
         }
       );
-      console.log("response", response);
       const { paymentIntent, ephemeralKey, customer, paymentIntentId } =
         response.data;
       setTransactionId(paymentIntentId);
@@ -117,7 +145,8 @@ const AnimalDetails = () => {
         customer,
       };
     } catch (error) {
-      console.error("this error:", error);
+      Alert.alert("Error:", error);
+      setLoading(false);
     }
   };
 
@@ -262,52 +291,80 @@ const AnimalDetails = () => {
             <Text className="text-sm text-gray-800">
               {animal.longDescription}
             </Text>
-            {/* Quantity Picker */}
-            <View className="flex-row justify-between my-4">
-              <View className="flex-row items-center my-4">
-                <Text className="text-lg text-gray-800 mr-4">Quantity:</Text>
-                <View className="flex-row items-center border rounded-md mr-5">
-                  <Button
-                    title="-"
-                    onPress={() => setQuantity(Math.max(1, quantity - 1))}
-                  />
-                  <Text className="mx-2">{quantity}</Text>
-                  <Button title="+" onPress={() => setQuantity(quantity + 1)} />
+
+            {animal.quantity !== 0 ? (
+              <View className="flex-row justify-between my-4">
+                <View className="flex-row items-center my-4">
+                  <Text className="text-lg text-gray-800 mr-4">Quantity:</Text>
+                  <View className="flex-row items-center border rounded-md mr-5">
+                    <Button
+                      title="-"
+                      onPress={() => setQuantity(Math.max(1, quantity - 1))}
+                    />
+                    <Text className="mx-2">{quantity}</Text>
+                    <Button
+                      title="+"
+                      disabled={quantity === animal.quantity}
+                      onPress={() => setQuantity(quantity + 1)}
+                    />
+                  </View>
+                </View>
+
+                {/* Total Price */}
+                <View className="flex-row items-center">
+                  <Text className="text-lg text-gray-800 ml-4 mr-4">
+                    Total Price:
+                  </Text>
+                  <Text className="text-xl text-primary font-tc-bold my-auto">{`$${totalPrice}`}</Text>
                 </View>
               </View>
-              {/* Total Price */}
-              <View className="flex-row items-center">
-                <Text className="text-lg text-gray-800 ml-4 mr-4">
-                  Total Price:
-                </Text>
-                <Text className="text-xl text-primary font-tc-bold my-auto">{`$${totalPrice}`}</Text>
-              </View>
-            </View>
+            ) : (
+              <Text className="mx-auto my-3 color-gray-600 text-lg">
+                Animal out of stock
+              </Text>
+            )}
             {/* Buy Now Button */}
-            <TouchableOpacity
-              onPress={
-                userDetails
-                  ? initializePaymentSheet
-                  : () => showAlert("You must be signed in to make payments")
-              }
-              className="bg-primary rounded-md py-3  flex-row items-center justify-center"
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <>
-                  {" "}
-                  <Ionicons name="cart" size={25} color="white" />
-                  <Text
-                    className="text-white text-center text-lg "
-                    style={{ marginLeft: 10 }}
-                  >
-                    Proceed to checkout
-                  </Text>
-                </>
-              )}
-            </TouchableOpacity>
+            {animal.quantity !== 0 ? (
+              <TouchableOpacity
+                onPress={
+                  userDetails
+                    ? initializePaymentSheet
+                    : () => showAlert("You must be signed in to make payments")
+                }
+                className="bg-primary rounded-md py-3  flex-row items-center justify-center"
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <>
+                    <Ionicons name="cart" size={25} color="white" />
+                    <Text
+                      className="text-white text-center text-lg "
+                      style={{ marginLeft: 10 }}
+                    >
+                      Proceed to checkout
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={
+                  userDetails
+                    ? placeOrder
+                    : () => showAlert("You must be signed in to make an order")
+                }
+                className="bg-primary rounded-md py-3 flex-row items-center justify-center"
+              >
+                <Text
+                  className="text-white text-center text-lg "
+                  style={{ marginLeft: 10 }}
+                >
+                  Place order
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>

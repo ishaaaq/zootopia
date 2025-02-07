@@ -49,7 +49,7 @@ const TransactionsPage = () => {
         item.amount / 100
       } USD`}</Text>
       <Text className="text-sm  text-gray-600">
-        {userDetails.usertype !== "supplier" ? "Purchased From" : "Sold To"}:{" "}
+        {userDetails.usertype !== "supplier" ? "Purchased From" : "Sold To"}:
         {userDetails.usertype !== "supplier" ? item.sellerId : item.buyerId}
       </Text>
     </TouchableOpacity>

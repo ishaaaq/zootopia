@@ -9,6 +9,7 @@ import {
   Modal,
   ScrollView,
   Switch,
+  ActivityIndicator,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -24,6 +25,7 @@ const AddAnimal = () => {
   const [successVisible, setSuccessVisible] = useState(false);
   const { userDetails, user } = useGlobalContext();
   const [isChecked, setIsChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const toggleCheckbox = () => setIsChecked(!isChecked);
   const handleImagePicker = () => {
@@ -31,9 +33,11 @@ const AddAnimal = () => {
   };
 
   const handleSubmit = async (values) => {
+    setLoading(true);
     const supplierId = userDetails.$id;
     const response = await addAnimal(supplierId, photo, values, isChecked);
     if (response) setSuccessVisible(true);
+    setLoading(false);
   };
 
   const selectImageFromGallery = async () => {
@@ -77,10 +81,12 @@ const AddAnimal = () => {
     quantity: "",
     price: "",
     longDescription: "",
+    image: "",
   };
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
+    image: Yup.string(),
     type: Yup.string().required("Type is required"),
     category: Yup.string().required("Category is required"),
     shortDescription: Yup.string().required("Short description is required"),
@@ -120,7 +126,7 @@ const AddAnimal = () => {
       </View>
 
       {/* Image Picker */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         className="mt-6 bg-gray-200 w-full h-40 rounded-lg flex items-center justify-center border border-gray-300"
         onPress={handleImagePicker}
       >
@@ -137,7 +143,7 @@ const AddAnimal = () => {
             <Text className="text-primary-500 text-2xl"> Add photo</Text>
           </View>
         )}
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* Form */}
       <Formik
@@ -165,6 +171,15 @@ const AddAnimal = () => {
               value={values.name}
               error={errors.name}
               touched={touched.name}
+            />
+            <InputField
+              label="Image Public URL"
+              placeholder="Link to image"
+              onChangeText={handleChange("image")}
+              onBlur={handleBlur("image")}
+              value={values.image}
+              error={errors.image}
+              touched={touched.image}
             />
             {/* Type */}
             <DropdownField
@@ -268,9 +283,14 @@ const AddAnimal = () => {
             <TouchableOpacity
               className=" bg-primary-500 py-4 rounded-lg"
               onPress={handleSubmit}
+              disabled={loading}
             >
-              <Text className="text-white text-center font-bold">Add</Text>
-            </TouchableOpacity>{" "}
+              {loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text className="text-white text-center font-bold">Add</Text>
+              )}
+            </TouchableOpacity>
           </View>
         )}
       </Formik>

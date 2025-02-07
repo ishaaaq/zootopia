@@ -14,12 +14,18 @@ import socket from "@/socket";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ChatScreen = () => {
-  const { conversationId, participantName, senderId } = useGlobalSearchParams(); // Passed when navigating to this screen
+  const { conversationId, participantName, senderId, order } =
+    useGlobalSearchParams(); // Passed when navigating to this screen
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const messagesRef = useRef([]);
 
   const navigation = useNavigation();
+  useEffect(() => {
+    if (order) {
+      setMessage(`I am interested in ${order}, when would it be available`);
+    }
+  }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -94,6 +100,7 @@ const ChatScreen = () => {
       socket.emit("send_message", tempMessage);
 
       await sendMessage(conversationId, senderId, message); // Send to Appwrite
+      setMessage("");
     }
   };
 

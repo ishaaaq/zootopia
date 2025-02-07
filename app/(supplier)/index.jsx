@@ -15,33 +15,30 @@ import { useSupplierAnimals } from "@/lib/SupplierAnimalsProvider";
 import { useGlobalContext } from "@/lib/global-provider";
 import { fetchAnimalsForCurrentUser } from "@/lib/AppWrite";
 import BellWithBadge from "@/components/BellWithBadge";
+import { useAppwrite } from "@/lib/UseAppwrite";
 const SupplierHome = () => {
   const router = useRouter();
   const { userDetails } = useGlobalContext();
   const [animals, setAnimals] = useState([]);
-  // const [loading, setLoading] = useState(false);
-  const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
+  // const [supplierAnimals, setSupplierAnimals] = useState([]);
 
-  useEffect(() => {
-    if (supplierAnimals) {
-      setAnimals(supplierAnimals);
-    }
-  }, [supplierAnimals]);
+  // const [loading, setLoading] = useState(false);
+  // const { supplierAnimals, loading, error, refetch } = useSupplierAnimals();
 
   // useEffect(() => {
-  //   const fetchAnimals = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const response = await fetchAnimalsForCurrentUser();
-  //       setAnimals(response);
-  //     } catch (error) {
-  //       console.error(error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchAnimals();
-  // }, []);
+  //   if (supplierAnimals) {
+  //     setAnimals(supplierAnimals);
+  //   }
+  // }, [supplierAnimals]);
+
+  const {
+    data: supplierAnimals,
+    error,
+    loading,
+    refetch,
+  } = useAppwrite({
+    fn: fetchAnimalsForCurrentUser,
+  });
 
   if (loading) {
     return (
@@ -51,9 +48,9 @@ const SupplierHome = () => {
     );
   }
 
-  if (error) {
-    return <Text>Error: {error.message}</Text>;
-  }
+  // if (error) {
+  //   return <Text>Error: {error.message}</Text>;
+  // }
 
   const renderAnimalCard = ({ item }) => (
     <TouchableOpacity
@@ -113,7 +110,7 @@ const SupplierHome = () => {
         </View>
       ) : (
         <FlatList
-          data={animals}
+          data={supplierAnimals}
           renderItem={renderAnimalCard}
           keyExtractor={(item) => item.$id}
           contentContainerStyle={{ paddingBottom: 20 }}

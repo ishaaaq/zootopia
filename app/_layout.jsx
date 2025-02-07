@@ -9,6 +9,7 @@ import { NotificationsProvider } from "@/lib/NotificationsContext";
 import { GlobalProvider, useGlobalContext } from "@/lib/global-provider";
 import { ActivityIndicator, StatusBar, View } from "react-native";
 import { StripeProvider } from "@stripe/stripe-react-native";
+import { ConversationsProvider } from "@/lib/ConversationsContext";
 const RootLayout = () => {
   const { userDetails, loading, initialRoute } = useGlobalContext();
   const [fontsLoaded] = useFonts({
@@ -52,6 +53,7 @@ const RootLayout = () => {
         barStyle="light-content"
         translucent={false}
       />
+
       <AnimalsProvider>
         <SupplierAnimalsProvider>
           <NotificationsProvider userId={userDetails?.$id}>
@@ -104,6 +106,7 @@ const RootLayout = () => {
                 name="auth/Login"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen name="Report" options={{ headerShown: false }} />
             </Stack>
           </NotificationsProvider>
         </SupplierAnimalsProvider>
@@ -115,9 +118,11 @@ const RootLayout = () => {
 const App = () => {
   return (
     <GlobalProvider>
-      <StripeProvider publishableKey="pk_test_51QkOYFDEuPKQynMzxjlRReQLf0sVwIFKKODnb0FGIKzgRGW3UQYFoE0qmKkleLoVPFbPz6RDvr7wqBPBObeOGJw400iuUOkUBA">
-        <RootLayout />
-      </StripeProvider>
+      <ConversationsProvider>
+        <StripeProvider publishableKey="pk_test_51QkOYFDEuPKQynMzxjlRReQLf0sVwIFKKODnb0FGIKzgRGW3UQYFoE0qmKkleLoVPFbPz6RDvr7wqBPBObeOGJw400iuUOkUBA">
+          <RootLayout />
+        </StripeProvider>
+      </ConversationsProvider>
     </GlobalProvider>
   );
 };

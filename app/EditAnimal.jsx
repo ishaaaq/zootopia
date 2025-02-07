@@ -235,7 +235,7 @@ const EditAnimal = () => {
               onPress={handleSubmit}
             >
               <Text className="text-white text-center font-bold">Save</Text>
-            </TouchableOpacity>{" "}
+            </TouchableOpacity>
           </View>
         )}
       </Formik>

@@ -41,7 +41,7 @@ const Notifications = () => {
 
   return (
     <View className="bg-white p-4 flex-1">
-      <Text className="text-xl font-bold mb-4">Notifications</Text>
+      {/* <Text className="text-xl font-bold mb-4">Notifications</Text> */}
       {notifications.length > 0 ? (
         <FlatList
           data={notifications}

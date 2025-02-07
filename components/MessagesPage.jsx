@@ -11,41 +11,42 @@ import { getConversations, getUserDetails } from "@/lib/AppWrite";
 import { useGlobalContext } from "@/lib/global-provider";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-
+import { useConversations } from "@/lib/ConversationsContext";
 const MessagesPage = () => {
-  const [conversations, setConversations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { conversations, fetchConversations, loading } = useConversations();
   const { userDetails } = useGlobalContext();
-
   useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const fetchedConversations = await getConversations(userDetails.$id);
-        const resolvedConversations = await Promise.all(
-          fetchedConversations.map(async (conversation) => {
-            const otherParticipantId = conversation.participants.find(
-              (id) => id !== userDetails.$id
-            );
-
-            const participantDetails = await getUserDetails(otherParticipantId);
-            return {
-              ...conversation,
-              participantName:
-                participantDetails.name || participantDetails.zooname,
-              avatar: participantDetails.avatar,
-            };
-          })
-        );
-        setConversations(resolvedConversations);
-      } catch (error) {
-        console.error("Error fetching conversations:", error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchConversations();
   }, []);
+  // useEffect(() => {
+  //   const fetchConversations = async () => {
+  //     try {
+  //       const fetchedConversations = await getConversations(userDetails.$id);
+  //       const resolvedConversations = await Promise.all(
+  //         fetchedConversations.map(async (conversation) => {
+  //           const otherParticipantId = conversation.participants.find(
+  //             (id) => id !== userDetails.$id
+  //           );
+
+  //           const participantDetails = await getUserDetails(otherParticipantId);
+  //           return {
+  //             ...conversation,
+  //             participantName:
+  //               participantDetails.name || participantDetails.zooname,
+  //             avatar: participantDetails.avatar,
+  //           };
+  //         })
+  //       );
+  //       setConversations(resolvedConversations);
+  //     } catch (error) {
+  //       console.error("Error fetching conversations:", error.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchConversations();
+  // }, []);
 
   const openConversation = (conversationId, participantName, senderId) => {
     router.push({
@@ -65,7 +66,7 @@ const MessagesPage = () => {
   return (
     <View className="flex-1 bg-white p-4">
       <Text className="text-3xl font-tc-bold mb-4">Messages</Text>
-      {conversations.length === 0 ? (
+      {!loading && conversations.length === 0 ? (
         <View className="flex-1 justify-center items-center px-6">
           <Image
             source={require("@/assets/images/noMessages.png")}

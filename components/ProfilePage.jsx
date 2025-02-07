@@ -16,7 +16,7 @@ import axios from "axios";
 const ProfilePage = () => {
   const { userDetails } = useGlobalContext();
   const [loading, setLoading] = useState(false);
-
+  const [stripeLoading, setStripeLoading] = useState(false);
   const handleLogout = async () => {
     setLoading(true);
     const res = await logout();
@@ -28,10 +28,11 @@ const ProfilePage = () => {
   };
 
   const handleConnectToStripe = async () => {
+    setStripeLoading(true);
     console.log("starting");
     try {
       const response = await axios.post(
-        "http://192.168.57.196:3000/stripe/create-account",
+        "http://192.168.211.196:3000/stripe/create-account",
         {
           sellerId: userDetails.$id, // Seller's ID
           email: userDetails.email, // Seller's email
@@ -43,8 +44,10 @@ const ProfilePage = () => {
       await updateSellerStripeAccount(userDetails.$id, stripeAccountId);
       router.push(`../WebViewPage?url=${encodeURIComponent(url)}`); // Navigate to WebView page with the URL
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
       Alert.alert("Error", "Failed to connect to Stripe.");
+    } finally {
+      setStripeLoading(false);
     }
   };
 
@@ -72,13 +75,13 @@ const ProfilePage = () => {
       </View>
 
       <View className="mt-0 space-y-6 px-4">
-        <TouchableOpacity
+        {/* <TouchableOpacity
           className="flex-row items-center border-b-2  border-gray-300 h-15"
           onPress={() => router.push("../EditProfile")}
         >
           <MaterialIcons name="edit" size={24} color="gray" />
           <Text className="text-base">Edit Profile</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {userDetails.usertype === "supplier" ? (
           userDetails.stripeAccountId == null ? (
@@ -86,8 +89,13 @@ const ProfilePage = () => {
               className="flex-row items-center border-b-2  border-gray-300 h-15"
               onPress={handleConnectToStripe}
             >
-              <MaterialIcons name="wallet" size={24} color="gray" />
-              <Text className="text-base">Connect to stripe</Text>
+              <View className="flex-row">
+                <MaterialIcons name="wallet" size={24} color="gray" />
+                <Text className="text-base">Connect to stripe</Text>
+              </View>
+              {stripeLoading && (
+                <ActivityIndicator color={"#CE4B26"} size={25} />
+              )}
             </TouchableOpacity>
           ) : (
             <View className="flex-row items-center border-b-2  border-gray-300 h-15">
